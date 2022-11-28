@@ -75,7 +75,7 @@ fn get_problem(day: u8) -> Result<String> {
     Ok(response)
 }
 
-pub fn solve(day: u8, part: u8, input: &str) -> String {
+fn solve(day: u8, part: u8, input: &str) -> String {
     match (day, part) {
         (1, 1) => day_01::part1(input),
         (1, 2) => day_01::part2(input),
@@ -126,32 +126,33 @@ pub fn solve(day: u8, part: u8, input: &str) -> String {
         (24, 1) => day_24::part1(input),
         (24, 2) => day_24::part2(input),
         (25, 1) => day_25::part1(input),
+        (25, 2) => day_25::part2(input),
         _ => unreachable!(),
     }
 }
 
-pub mod day_01;
-pub mod day_02;
-pub mod day_03;
-pub mod day_04;
-pub mod day_05;
-pub mod day_06;
-pub mod day_07;
-pub mod day_08;
-pub mod day_09;
-pub mod day_10;
-pub mod day_11;
-pub mod day_12;
-pub mod day_13;
-pub mod day_14;
-pub mod day_15;
-pub mod day_16;
-pub mod day_17;
-pub mod day_18;
-pub mod day_19;
-pub mod day_20;
-pub mod day_21;
-pub mod day_22;
-pub mod day_23;
-pub mod day_24;
-pub mod day_25;
+mod day_01;
+mod day_02;
+mod day_03;
+mod day_04;
+mod day_05;
+mod day_06;
+mod day_07;
+mod day_08;
+mod day_09;
+mod day_10;
+mod day_11;
+mod day_12;
+mod day_13;
+mod day_14;
+mod day_15;
+mod day_16;
+mod day_17;
+mod day_18;
+mod day_19;
+mod day_20;
+mod day_21;
+mod day_22;
+mod day_23;
+mod day_24;
+mod day_25;
