@@ -1,0 +1,12 @@
+{
+  "name": "alicarpio-aoc-2022",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "npx tsc --outDir build --strict",
+    "solution": "npm run build && node build/main.js"
+  },
+  "devDependencies": {
+    "typescript": "^4.6.4"
+  }
+}
