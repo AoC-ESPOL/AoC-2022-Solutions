@@ -1,0 +1,81 @@
+cabal-version:      2.4
+name:               aoc-solutions
+version:            0.1.0.0
+synopsis:           Solutions to advent of code challenges
+-- bug-reports:
+license:            MIT
+-- author:
+-- maintainer:
+-- copyright:
+-- category:
+extra-source-files: README.md
+
+library
+    exposed-modules:
+          Aoc.Day.One.PartOne
+        , Aoc.Day.One.PartTwo
+        , Aoc.Day.One.Common
+    build-depends:
+          base                 ^>=4.15.1.0
+        , array                >= 0.5.4 && < 0.6
+        , attoparsec           >= 0.14.4 && < 0.15
+        , bytestring           >= 0.10.12 && < 0.11
+        , containers           >= 0.6.4 && < 0.7
+        , primitive            >= 0.7.4 && < 0.8
+        , text                 >= 1.2.5 && < 1.3
+        , unordered-containers >= 0.2.19 && < 0.3
+        , vector               >= 0.13.0 && < 0.14
+    hs-source-dirs:   lib
+    ghc-options: -Wall
+    default-language: Haskell2010
+    default-extensions: OverloadedStrings
+
+executable aoc-runner
+   main-is: Main.hs
+   ghc-options: -Wunused-packages -Wall
+   other-modules: Input
+   build-depends:
+          base ^>=4.15.1.0
+        , aoc-solutions
+        , filepath             >= 1.4.2 && < 1.5
+        , text                 >= 1.2.5 && < 1.3
+   hs-source-dirs: app
+   default-language: Haskell2010
+   default-extensions: OverloadedStrings
+
+test-suite test-solutions
+    type: exitcode-stdio-1.0
+    ghc-options: -Wunused-packages -Wall
+    main-is: Spec.hs
+    hs-source-dirs: test
+    other-modules:
+        DayOneSpec
+    build-depends:
+            base ^>=4.15.1.0
+          , aoc-solutions
+          , hspec
+    default-language: Haskell2010
+    default-extensions: OverloadedStrings
+
+
+executable aoc
+   main-is: Main.hs
+   ghc-options: -Wunused-packages -Wall
+   other-modules:
+        Aoc.Tool.Options
+      , Aoc.Tool.Gen
+      , Aoc.Tool.Print
+      , Aoc.Tool.Input
+   build-depends:
+          base                 ^>=4.15.1.0
+        , directory            >= 1.3.6 && < 1.4
+        , filepath             >= 1.4.2 && < 1.5
+        , optparse-applicative >= 0.17.0 && < 0.18
+        , req
+        , text
+        , dotenv
+        , bytestring
+        , utf8-string
+   hs-source-dirs: tool/aoc
+   default-language: Haskell2010
+   default-extensions: OverloadedStrings
