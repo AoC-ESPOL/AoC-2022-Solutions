@@ -1,34 +1,25 @@
-use std::cmp::Reverse;
+use std::collections::BinaryHeap;
+
+fn calories_per_elf(input: &str) -> impl Iterator<Item = u32> + '_ {
+    input.split("\n\n").map(|elf_cals| -> u32 {
+        elf_cals
+            .lines()
+            .map(|line| line.parse::<u32>().unwrap())
+            .sum()
+    })
+}
 
 pub fn part1(input: &str) -> String {
-    input
-        .split("\n\n")
-        .map(|elf_cals| {
-            elf_cals
-                .lines()
-                .map(|line| line.parse::<u32>().unwrap())
-                .sum::<u32>()
-        })
-        .max()
-        .unwrap()
-        .to_string()
+    calories_per_elf(input).max().unwrap().to_string()
 }
 
 pub fn part2(input: &str) -> String {
-    let mut calories: Vec<_> = input
-        .split("\n\n")
-        .map(|elf_cals| {
-            elf_cals
-                .lines()
-                .map(|line| line.parse::<u32>().unwrap())
-                .sum::<u32>()
-        })
-        .collect();
-
-    calories.sort_by_key(|&cals| Reverse(cals));
-    calories.truncate(3);
-
-    calories.into_iter().sum::<u32>().to_string()
+    calories_per_elf(input)
+        .collect::<BinaryHeap<_>>()
+        .into_iter()
+        .take(3)
+        .sum::<u32>()
+        .to_string()
 }
 
 #[cfg(test)]
