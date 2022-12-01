@@ -47,15 +47,18 @@ fn get_problem(day: u8) -> Result<String> {
 
     let file_path = format!("./files/day{day:02}.txt");
 
-    let session_cookie = match fs::read_to_string(&file_path) {
+    let (session_cookie, user_agent) = match fs::read_to_string(&file_path) {
         // If file exists, return the file
         Ok(aoc_problem) => return Ok(aoc_problem),
         // If os_error, return the error
         Err(e) if e.kind() != std::io::ErrorKind::NotFound => {
             return Err(e).wrap_err("couldn't access cached file")
         }
-        // If file not found, get session cookie
-        Err(_) => std::env::var("AOC_SESSION").wrap_err("AOC_SESSION not found")?,
+        // If file not found, get session cookie and user agent
+        Err(_) => (
+            std::env::var("AOC_SESSION").wrap_err("AOC_SESSION not found")?,
+            std::env::var("USER_AGENT").wrap_err("USER_AGENT not found")?,
+        ),
     };
 
     // TODO: use tracing
@@ -65,6 +68,7 @@ fn get_problem(day: u8) -> Result<String> {
 
     let response = ureq::get(&format!("https://adventofcode.com/2022/day/{day}/input"))
         .set("Cookie", &cookie.to_string())
+        .set("User-Agent", &user_agent)
         .call()
         .wrap_err("maybe too soon")?
         .into_string()?;
