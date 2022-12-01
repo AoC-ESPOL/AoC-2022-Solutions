@@ -9,17 +9,16 @@ fn calories_per_elf(input: &str) -> impl Iterator<Item = u32> + '_ {
     })
 }
 
-pub fn part1(input: &str) -> String {
-    calories_per_elf(input).max().unwrap().to_string()
+pub fn part1(input: &str) -> u32 {
+    calories_per_elf(input).max().unwrap()
 }
 
-pub fn part2(input: &str) -> String {
+pub fn part2(input: &str) -> u32 {
     calories_per_elf(input)
         .collect::<BinaryHeap<_>>()
         .into_iter()
         .take(3)
-        .sum::<u32>()
-        .to_string()
+        .sum()
 }
 
 #[cfg(test)]
@@ -45,7 +44,7 @@ mod tests {
     #[test]
     #[ignore]
     fn part1_works() {
-        let output = 24000.to_string();
+        let output = 24000;
 
         assert_eq!(part1(TEST_INPUT), output);
     }
@@ -53,7 +52,7 @@ mod tests {
     #[test]
     #[ignore]
     fn part2_works() {
-        let output = 45000.to_string();
+        let output = 45000;
 
         assert_eq!(part2(TEST_INPUT), output);
     }
