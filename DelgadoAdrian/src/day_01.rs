@@ -1,10 +1,8 @@
-use std::collections::BinaryHeap;
-
 fn calories_per_elf(input: &str) -> impl Iterator<Item = u32> + '_ {
     input.split("\n\n").map(|elf_cals| -> u32 {
         elf_cals
             .lines()
-            .map(|line| line.parse::<u32>().unwrap())
+            .map(|line| -> u32 { line.parse().unwrap() })
             .sum()
     })
 }
@@ -14,11 +12,9 @@ pub fn part1(input: &str) -> u32 {
 }
 
 pub fn part2(input: &str) -> u32 {
-    calories_per_elf(input)
-        .collect::<BinaryHeap<_>>()
-        .into_iter()
-        .take(3)
-        .sum()
+    let mut calories: Vec<_> = calories_per_elf(input).collect();
+    calories.sort_unstable();
+    calories.into_iter().rev().take(3).sum()
 }
 
 #[cfg(test)]
