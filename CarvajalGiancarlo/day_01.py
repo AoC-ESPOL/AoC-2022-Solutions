@@ -1,0 +1,1 @@
+print("\n¡AoC! - Day 01\n\n")
