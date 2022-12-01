@@ -1,6 +1,6 @@
 package day_01;
 
-import static day_01.common.sumOfCalories;
+import static day_01.Common.sumOfCalories;
 
 public class PartOne {
     public static void main(String[] args) {

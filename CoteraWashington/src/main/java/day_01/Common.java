@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class common {
+public class Common {
     public static List<String> createListOfCalories(String fileName) {
         List<String> list = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader(fileName))) {
@@ -35,6 +35,6 @@ public class common {
         return sumCalories;
     }
 
-    public static List<String> listOfCalories = createListOfCalories("src/main/resources/inputOne.txt");
+    public static List<String> listOfCalories = createListOfCalories("src/main/resources/inputDayOne.txt");
     public static List<Integer> sumOfCalories = createListOfSumCalories(listOfCalories);
 }
