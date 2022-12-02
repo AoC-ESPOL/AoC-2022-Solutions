@@ -1,4 +1,4 @@
-import { getInput } from '../common'
+
 import { getCaloriesPerElf} from '../common'
 
 

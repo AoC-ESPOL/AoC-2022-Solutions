@@ -1,7 +1,7 @@
 import {
     partOne,
     partTwo
-} from "./Day01"
+} from "./Day02"
 
 
 console.log(`Part one solution: ${partOne()}`)
