@@ -12,7 +12,7 @@ public class day_01 {
 		//parte1
 		int max = 0;
 		
-		try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/input/input1.txt"))){
+		try (BufferedReader br = new BufferedReader(new FileReader("input"))){
 			int count = 0;
 			String linea;
 			while((linea = br.readLine()) != null) {
@@ -34,7 +34,7 @@ public class day_01 {
 		
 		//parte2
 		List<Integer> totales = new LinkedList<>();
-		try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/input/input1.txt"))){
+		try (BufferedReader br = new BufferedReader(new FileReader("input"))){
 			int count = 0;
 			String linea;
 			while((linea = br.readLine()) != null) {
