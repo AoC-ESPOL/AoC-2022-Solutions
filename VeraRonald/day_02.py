@@ -3,7 +3,7 @@ score_table = {"loss": 0, "draw": 3, "win": 6}
 win_moves = {"rock": "paper", "paper":"scissor", "scissor": "rock" } #  oponent: me
 loss_moves = {"rock": "scissor", "paper":"rock", "scissor": "paper" } #  oponent: me
 
-def getData1(file):
+def getData(file, way): # Parameter how_move or how_result
     moves = []
     try:
         with open(file, 'r') as file:
@@ -11,38 +11,27 @@ def getData1(file):
             for line in lines:
                 play_info = line.strip().split(" ")
                 opponent = play_info[0]
-                me = play_info[1]
-                move = {}
 
-                for key, value in options.items():
-                    if opponent in value:
-                        move["opponent"] = key
-                    if me in value:
-                        move["me"] = key
-                    if len(move.keys()) == 2:
-                        break
-                moves.append([move["opponent"], move["me"]])
+                if way == "how_move":
+                    me = play_info[1]
+                    move = {}
 
-            return moves
-
-    except FileNotFoundError:
-        print('File not found')
-
-def getData2(file):
-    moves = []
-    try:
-        with open(file, 'r') as file:
-            lines = file.readlines()
-            for line in lines:
-                play_info = line.strip().split(" ")
-                opponent = play_info[0]
-                for key, value in options.items():
-                    if opponent in value:
-                        opponent = key
-                        break
-                result = play_info[1]
-                me = calculeMove(opponent, result)
-                moves.append([opponent, me])
+                    for key, value in options.items():
+                        if opponent in value:
+                            move["opponent"] = key
+                        if me in value:
+                            move["me"] = key
+                        if len(move.keys()) == 2:
+                            break
+                    moves.append([move["opponent"], move["me"]])
+                elif way == "how_result":
+                    for key, value in options.items():
+                        if opponent in value:
+                            opponent = key
+                            break
+                    result = play_info[1]
+                    me = calculeMove(opponent, result)
+                    moves.append([opponent, me])
 
             return moves
 
@@ -80,12 +69,12 @@ def calculeMove(previous_move, expected_result):
         next_move = win_moves[previous_move]
     return next_move
 # PART 1
-jugadas = getData1("input.txt")
+jugadas = getData("input.txt", "how_move")
 puntajes = getScores(jugadas)
 puntaje_total = sum(puntajes)
 print(puntaje_total)
 # PART 2
-jugadas = getData2("input.txt")
+jugadas = getData("input.txt", "how_result")
 puntajes = getScores(jugadas)
 puntaje_total = sum(puntajes)
 print(puntaje_total)
