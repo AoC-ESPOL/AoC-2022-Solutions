@@ -1,0 +1,12 @@
+{
+  "name": "adventofcode-2022",
+  "version": "1.0.0",
+  "description": "Advent of Code 2022 solutions",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "edsalloor",
+  "license": "ISC"
+}
