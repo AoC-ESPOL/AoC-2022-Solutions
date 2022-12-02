@@ -15,6 +15,11 @@ library
           Aoc.Day.One.PartOne
         , Aoc.Day.One.PartTwo
         , Aoc.Day.One.Common
+        , Aoc.Day.One.Solution
+        , Aoc.Class
+        , Aoc.Util
+        , Aoc.Input
+        , Aoc.Types
     build-depends:
           base                 ^>=4.15.1.0
         , array                >= 0.5.4 && < 0.6
@@ -22,26 +27,25 @@ library
         , bytestring           >= 0.10.12 && < 0.11
         , containers           >= 0.6.4 && < 0.7
         , primitive            >= 0.7.4 && < 0.8
+        , filepath             >= 1.4.2 && < 1.5
         , text                 >= 1.2.5 && < 1.3
         , unordered-containers >= 0.2.19 && < 0.3
         , vector               >= 0.13.0 && < 0.14
     hs-source-dirs:   lib
     ghc-options: -Wall
     default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    default-extensions: OverloadedStrings, TypeFamilies, LambdaCase, FlexibleInstances, TypeApplications
 
 executable aoc-runner
    main-is: Main.hs
    ghc-options: -Wunused-packages -Wall
-   other-modules: Input
+   -- other-modules:
    build-depends:
           base ^>=4.15.1.0
         , aoc-solutions
-        , filepath             >= 1.4.2 && < 1.5
-        , text                 >= 1.2.5 && < 1.3
    hs-source-dirs: app
    default-language: Haskell2010
-   default-extensions: OverloadedStrings
+   default-extensions: OverloadedStrings, TypeApplications, TypeFamilies
 
 test-suite test-solutions
     type: exitcode-stdio-1.0

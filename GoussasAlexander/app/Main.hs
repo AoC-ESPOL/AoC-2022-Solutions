@@ -1,22 +1,28 @@
 module Main where
 
-import Control.Monad (forM_)
-import Data.Text (Text)
-import Input
-import System.Environment (getArgs)
+import           Aoc.Class
+import           Aoc.Day.One.Solution
+import           Aoc.Input
+import           Aoc.Types
 
--- NOTE: Add here the solutions for each day.
-solveDay :: Int -> Text -> IO (Int, Int)
-solveDay _day _input = error "Invalid day"
+import           Control.Monad        (forM_)
+import           System.Environment   (getArgs)
 
-solve :: Day -> IO ()
-solve day = inputForDay day >>= solveDay (toInt day) >>= printSolutions day
 
-printSolutions :: (Show a, Show b) => Day -> (a, b) -> IO ()
-printSolutions day (p1, p2) = do
-  putStrLn $ "Solutions for day " <> show (toInt day)
-  putStrLn $ "Part I:  " <> show p1
-  putStrLn $ "Part II: " <> show p2
+printSolutions :: (Show a, Show b) => AocDay -> (a, b) -> IO ()
+printSolutions day (p1, p2) = putStrLn $ mconcat
+  [ "Solutions for day " <> show (toInt day) <> "\n"
+  , "Part I:  " <> show p1 <> "\n"
+  , "Part II: " <> show p2
+  ]
+
+solve :: AocDay -> IO ()
+solve day
+  | toInt day == 1 = solve' dayOne
+  | otherwise = error $ "No solution for day " <> show day
+  where
+    solve' :: (Aoc a, Result a ~ (b, c), Show b, Show c) => a -> IO ()
+    solve' sln = inputForDay day >>= solution sln >>= printSolutions day
 
 main :: IO ()
 main = do

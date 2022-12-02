@@ -79,60 +79,49 @@ fn get_problem(day: u8) -> Result<String> {
     Ok(response)
 }
 
+macro_rules! match_solvers {
+    (($curr_day:ident, $curr_part:ident, $input:ident) , [$(($day:literal,$module:ident)),+ $(,)?]) => {
+        match ($curr_day, $curr_part) {
+        $(
+            ($day, 1) => $module::part1($input).to_string(),
+            ($day, 2) => $module::part2($input).to_string(),
+        )+
+            _ => unreachable!(),
+        }
+    };
+}
+
 fn solve(day: u8, part: u8, input: &str) -> String {
-    match (day, part) {
-        (1, 1) => day_01::part1(input),
-        (1, 2) => day_01::part2(input),
-        (2, 1) => day_02::part1(input),
-        (2, 2) => day_02::part2(input),
-        (3, 1) => day_03::part1(input),
-        (3, 2) => day_03::part2(input),
-        (4, 1) => day_04::part1(input),
-        (4, 2) => day_04::part2(input),
-        (5, 1) => day_05::part1(input),
-        (5, 2) => day_05::part2(input),
-        (6, 1) => day_06::part1(input),
-        (6, 2) => day_06::part2(input),
-        (7, 1) => day_07::part1(input),
-        (7, 2) => day_07::part2(input),
-        (8, 1) => day_08::part1(input),
-        (8, 2) => day_08::part2(input),
-        (9, 1) => day_09::part1(input),
-        (9, 2) => day_09::part2(input),
-        (10, 1) => day_10::part1(input),
-        (10, 2) => day_10::part2(input),
-        (11, 1) => day_11::part1(input),
-        (11, 2) => day_11::part2(input),
-        (12, 1) => day_12::part1(input),
-        (12, 2) => day_12::part2(input),
-        (13, 1) => day_13::part1(input),
-        (13, 2) => day_13::part2(input),
-        (14, 1) => day_14::part1(input),
-        (14, 2) => day_14::part2(input),
-        (15, 1) => day_15::part1(input),
-        (15, 2) => day_15::part2(input),
-        (16, 1) => day_16::part1(input),
-        (16, 2) => day_16::part2(input),
-        (17, 1) => day_17::part1(input),
-        (17, 2) => day_17::part2(input),
-        (18, 1) => day_18::part1(input),
-        (18, 2) => day_18::part2(input),
-        (19, 1) => day_19::part1(input),
-        (19, 2) => day_19::part2(input),
-        (20, 1) => day_20::part1(input),
-        (20, 2) => day_20::part2(input),
-        (21, 1) => day_21::part1(input),
-        (21, 2) => day_21::part2(input),
-        (22, 1) => day_22::part1(input),
-        (22, 2) => day_22::part2(input),
-        (23, 1) => day_23::part1(input),
-        (23, 2) => day_23::part2(input),
-        (24, 1) => day_24::part1(input),
-        (24, 2) => day_24::part2(input),
-        (25, 1) => day_25::part1(input),
-        (25, 2) => day_25::part2(input),
-        _ => unreachable!(),
-    }
+    match_solvers!(
+        (day, part, input),
+        [
+            (1, day_01),
+            (2, day_02),
+            (3, day_03),
+            (4, day_04),
+            (5, day_05),
+            (6, day_06),
+            (7, day_07),
+            (8, day_08),
+            (9, day_09),
+            (10, day_10),
+            (11, day_11),
+            (12, day_12),
+            (13, day_13),
+            (14, day_14),
+            (15, day_15),
+            (16, day_16),
+            (17, day_17),
+            (18, day_18),
+            (19, day_19),
+            (20, day_20),
+            (21, day_21),
+            (22, day_22),
+            (23, day_23),
+            (24, day_24),
+            (25, day_25),
+        ]
+    )
 }
 
 mod day_01;
