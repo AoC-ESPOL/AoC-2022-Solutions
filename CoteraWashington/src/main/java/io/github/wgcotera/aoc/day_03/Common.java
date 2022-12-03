@@ -1,14 +1,22 @@
 package io.github.wgcotera.aoc.day_03;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Common {
 
-    public static List<String> createListOfPlay(String input) {
+    //    Lowercase item types a through z have priorities 1 through 26.
+    //    Uppercase item types A through Z have priorities 27 through 52.
 
-        List<String> listOfPlay = input.lines().toList();
-
-        return new ArrayList<>();
+    public static Map<String, Integer> createMapOfLetterPriority() {
+        Map<String, Integer> map = new HashMap<>();
+        for (int i = 1; i <= 26; i++) {
+            map.put(String.valueOf((char) (i + 96)), i);
+        }
+        for (int i = 1; i <= 26; i++) {
+            map.put(String.valueOf((char) (i + 64)), i + 26);
+        }
+        return map;
     }
+
 }

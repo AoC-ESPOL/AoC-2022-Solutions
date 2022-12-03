@@ -10,18 +10,13 @@ class PartOneTest {
 
         var partOne = new PartOne();
         var solution = partOne.solution("""
-                                                ..##.......
-                                                #...#...#..
-                                                .#....#..#.
-                                                ..#.#...#.#
-                                                .#...##..#.
-                                                ..#.##.....
-                                                .#.#.#....#
-                                                .#........#
-                                                #.##...#...
-                                                #...##....#
-                                                .#..#...#.#""");
-        assertEquals(solution, 7);
+                                            vJrwpWtwJgWrhcsFMMfFFhFp
+                                            jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+                                            PmmdzqPrVvPwwTWBwg
+                                            wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+                                            ttgJtRGJQctTZtZT
+                                            CrZsJsPPZsGzwwsLwLmpwMDw""");
+        assertEquals(solution, 157);
 
     }
 }

@@ -10,17 +10,12 @@ class PartTwoTest {
 
         var partTwo = new PartTwo();
         var solution = partTwo.solution("""
-                                                ..##.......
-                                                #...#...#..
-                                                .#....#..#.
-                                                ..#.#...#.#
-                                                .#...##..#.
-                                                ..#.##.....
-                                                .#.#.#....#
-                                                .#........#
-                                                #.##...#...
-                                                #...##....#
-                                                .#..#...#.#""");
-        assertEquals(solution, 336);
+                                            vJrwpWtwJgWrhcsFMMfFFhFp
+                                            jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+                                            PmmdzqPrVvPwwTWBwg
+                                            wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+                                            ttgJtRGJQctTZtZT
+                                            CrZsJsPPZsGzwwsLwLmpwMDw""");
+        assertEquals(solution, 70);
     }
 }
