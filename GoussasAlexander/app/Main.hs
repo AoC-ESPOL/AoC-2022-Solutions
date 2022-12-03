@@ -2,12 +2,13 @@ module Main where
 
 import           Aoc.Class
 import           Aoc.Day.One.Solution
+import           Aoc.Day.Three.Solution
 import           Aoc.Day.Two.Solution
 import           Aoc.Input
 import           Aoc.Types
 
-import           Control.Monad        (forM_)
-import           System.Environment   (getArgs)
+import           Control.Monad          (forM_)
+import           System.Environment     (getArgs)
 
 
 printSolutions :: (Show a, Show b) => AocDay -> (a, b) -> IO ()
@@ -21,6 +22,7 @@ solve :: AocDay -> IO ()
 solve day
   | toInt day == 1 = solve' dayOne
   | toInt day == 2 = solve' dayTwo
+  | toInt day == 3 = solve' dayThree
   | otherwise = error $ "No solution for day " <> show day
   where
     solve' :: (Aoc a, Result a ~ (b, c), Show b, Show c) => a -> IO ()
