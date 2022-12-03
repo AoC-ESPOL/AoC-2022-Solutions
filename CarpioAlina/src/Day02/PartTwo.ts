@@ -1,3 +1,5 @@
+import {calculateScore} from "./common";
+
 const EMPATE = 3
 const PIERDE = 0
 const GANA = 6
@@ -6,27 +8,9 @@ const A = 1
 const B = 2
 const C = 3
 
-import {getInput} from '../common'
 
-export default function solution() {
-    const input = getInput('02')
-    const partidas = input.split('\n')
-    let result: Array<Array<string>> = []
-    let actual = 0
-    let suma = 0
-
-    partidas.forEach((partida) => {
-        result.push(partida.split(' '))
-    })
-
-    result.forEach((partida) => {
-        actual = getState(partida[0], partida[1])
-        suma += actual
-
-        console.log(partida[0], partida[1], suma)
-    })
-
-    return suma
+export default function solution(input: string) {
+    return calculateScore(input, getState)
 }
 
 
