@@ -4,9 +4,12 @@
   "version": "0.0.0",
   "scripts": {
     "build": "npx tsc --outDir build --strict",
-    "solution": "npm run build && node build/main.js"
+    "solution": "npm run build && node build/main.js",
+    "test": "vitest"
   },
   "devDependencies": {
-    "typescript": "^4.6.4"
+    "@types/node": "^18.11.10",
+    "typescript": "^4.6.4",
+    "vitest": "^0.25.3"
   }
 }

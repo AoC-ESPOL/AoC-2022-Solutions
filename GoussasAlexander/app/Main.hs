@@ -2,6 +2,7 @@ module Main where
 
 import           Aoc.Class
 import           Aoc.Day.One.Solution
+import           Aoc.Day.Two.Solution
 import           Aoc.Input
 import           Aoc.Types
 
@@ -19,6 +20,7 @@ printSolutions day (p1, p2) = putStrLn $ mconcat
 solve :: AocDay -> IO ()
 solve day
   | toInt day == 1 = solve' dayOne
+  | toInt day == 2 = solve' dayTwo
   | otherwise = error $ "No solution for day " <> show day
   where
     solve' :: (Aoc a, Result a ~ (b, c), Show b, Show c) => a -> IO ()

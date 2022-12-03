@@ -16,6 +16,10 @@ library
         , Aoc.Day.One.PartTwo
         , Aoc.Day.One.Common
         , Aoc.Day.One.Solution
+        , Aoc.Day.Two.PartOne
+        , Aoc.Day.Two.PartTwo
+        , Aoc.Day.Two.Common
+        , Aoc.Day.Two.Solution
         , Aoc.Class
         , Aoc.Util
         , Aoc.Input
@@ -53,7 +57,8 @@ test-suite test-solutions
     main-is: Spec.hs
     hs-source-dirs: test
     other-modules:
-        DayOneSpec
+          DayOneSpec
+        , DayTwoSpec
     build-depends:
             base ^>=4.15.1.0
           , aoc-solutions
