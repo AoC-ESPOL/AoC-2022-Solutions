@@ -20,6 +20,10 @@ library
         , Aoc.Day.Two.PartTwo
         , Aoc.Day.Two.Common
         , Aoc.Day.Two.Solution
+        , Aoc.Day.Three.PartOne
+        , Aoc.Day.Three.PartTwo
+        , Aoc.Day.Three.Common
+        , Aoc.Day.Three.Solution
         , Aoc.Class
         , Aoc.Util
         , Aoc.Input
@@ -59,10 +63,12 @@ test-suite test-solutions
     other-modules:
           DayOneSpec
         , DayTwoSpec
+        , DayThreeSpec
     build-depends:
             base ^>=4.15.1.0
           , aoc-solutions
           , hspec
+          , text
     default-language: Haskell2010
     default-extensions: OverloadedStrings
 
