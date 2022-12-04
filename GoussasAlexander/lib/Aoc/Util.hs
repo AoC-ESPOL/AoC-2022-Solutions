@@ -10,6 +10,10 @@ tupled b c = (,) <$> b <*> c
 range :: Int -> Int -> [Int]
 range start end =  [start..end]
 
+-- | 'lineP' parses a line and returns it, not including the newline character.
+lineP :: Parser Text
+lineP = takeWhile1 (not . isEndOfLine) <* endOfLine
+
 runParser :: Parser a -> Text -> a
 runParser parser =
     either error id

@@ -1,9 +1,9 @@
 module Aoc.Day.Three.PartOne where
 
 import           Aoc.Class
+import           Aoc.Day.Three.Common
 
-import           Aoc.Day.Three.Common (getItemPriority, getMisplacedItem,
-                                       parseInput)
+import           Data.List
 import           Data.Proxy
 
 
@@ -18,3 +18,9 @@ instance Aoc (Proxy Day3Part1) where
   solution _ input = do
     let rucksacks = parseInput input
     pure $ sum $ map (getItemPriority . getMisplacedItem) rucksacks
+
+
+getMisplacedItem :: Rucksack -> Item
+getMisplacedItem = head . uncurry intersect
+
+
