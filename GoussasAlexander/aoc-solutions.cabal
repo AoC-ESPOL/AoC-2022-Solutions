@@ -24,6 +24,10 @@ library
         , Aoc.Day.Three.PartTwo
         , Aoc.Day.Three.Common
         , Aoc.Day.Three.Solution
+        , Aoc.Day.Four.PartOne
+        , Aoc.Day.Four.PartTwo
+        , Aoc.Day.Four.Common
+        , Aoc.Day.Four.Solution
         , Aoc.Class
         , Aoc.Util
         , Aoc.Input
@@ -64,6 +68,7 @@ test-suite test-solutions
           DayOneSpec
         , DayTwoSpec
         , DayThreeSpec
+        , DayFourSpec
     build-depends:
             base ^>=4.15.1.0
           , aoc-solutions

@@ -1,6 +1,7 @@
 module Main where
 
 import           Aoc.Class
+import           Aoc.Day.Four.Solution
 import           Aoc.Day.One.Solution
 import           Aoc.Day.Three.Solution
 import           Aoc.Day.Two.Solution
@@ -8,6 +9,7 @@ import           Aoc.Input
 import           Aoc.Types
 
 import           Control.Monad          (forM_)
+import           Data.Proxy
 import           System.Environment     (getArgs)
 
 
@@ -23,6 +25,7 @@ solve day
   | toInt day == 1 = solve' dayOne
   | toInt day == 2 = solve' dayTwo
   | toInt day == 3 = solve' dayThree
+  | toInt day == 4 = solve' (Proxy @DayFour)
   | otherwise = error $ "No solution for day " <> show day
   where
     solve' :: (Aoc a, Result a ~ (b, c), Show b, Show c) => a -> IO ()
