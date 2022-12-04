@@ -4,7 +4,7 @@ import io.github.wgcotera.aoc.Aoc;
 
 import java.util.*;
 
-import static io.github.wgcotera.aoc.day_03.Common.createMapOfLetterPriority;
+import static io.github.wgcotera.aoc.day_03.Common.mapOfLetterPriority;
 
 public class PartTwo implements Aoc<Integer> {
 
@@ -13,7 +13,7 @@ public class PartTwo implements Aoc<Integer> {
         List<String> listRucksacks = input.lines().toList();
         List<String> itemsRepeated = new ArrayList<>();
 
-        for (int i = 0; i < listRucksacks.size(); i = i + 3) {
+        for (int i = 0; i < listRucksacks.size(); i += 3) {
 
             Set<String> r1 = new HashSet<>(Arrays.stream(listRucksacks.get(i).split("")).toList());
             Set<String> r2 = new HashSet<>(Arrays.stream(listRucksacks.get(i + 1).split("")).toList());
@@ -34,10 +34,7 @@ public class PartTwo implements Aoc<Integer> {
 
     @Override
     public Integer solution(String input) {
-
         List<String> ListOfItemRepeatedInRucksacks = listOfitemsRepeatedEachThreeRucksacks(input);
-        Map<String, Integer> mapOfLetterPriority = createMapOfLetterPriority();
-
         return ListOfItemRepeatedInRucksacks.stream().mapToInt(mapOfLetterPriority::get).sum();
     }
 
