@@ -6,6 +6,7 @@ authors = ["Adrian Delgado <aoc2022@adrianjdelgado.com>"]
 
 
 [dependencies]
+bstr = "1.0.1"
 clap = { version = "4.0.29", features = ["derive"] }
 color-eyre = "0.6.2"
 dotenvy = "0.15.6"
