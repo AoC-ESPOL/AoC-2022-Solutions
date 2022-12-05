@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static io.github.wgcotera.aoc.day_04.Common.createSetOfNumbers;
+import static io.github.wgcotera.aoc.day_04.Common.createSetOfRangeOfNumbers;
 
 public class PartOne implements Aoc<Integer> {
 
@@ -22,8 +22,8 @@ public class PartOne implements Aoc<Integer> {
         int result = 0;
 
         for (List<String> p : listOfPairs) {
-            Set<Integer> set1 = createSetOfNumbers(p.get(0));
-            Set<Integer> set2 = createSetOfNumbers(p.get(1));
+            Set<Integer> set1 = createSetOfRangeOfNumbers(p.get(0));
+            Set<Integer> set2 = createSetOfRangeOfNumbers(p.get(1));
 
             if (set1.containsAll(set2) || set2.containsAll(set1)) result++;
         }

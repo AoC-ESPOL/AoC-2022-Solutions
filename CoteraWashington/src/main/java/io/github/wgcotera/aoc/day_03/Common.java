@@ -14,8 +14,6 @@ public class Common {
         Map<String, Integer> map = new HashMap<>();
         for (int i = 1; i <= 26; i++) {
             map.put(String.valueOf((char) (i + 96)), i);
-        }
-        for (int i = 1; i <= 26; i++) {
             map.put(String.valueOf((char) (i + 64)), i + 26);
         }
         return map;

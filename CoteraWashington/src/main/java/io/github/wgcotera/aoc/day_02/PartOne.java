@@ -17,19 +17,19 @@ public class PartOne implements Aoc<Integer> {
     public static int myPlayScore(String op, String me) {
         return letterValue(me) + switch (op) {
             case "A" -> switch (me) {
-                case "X" -> DRAW.value;
-                case "Y" -> WIN.value;
-                default -> LOSE.value;
+                case "X" -> DRAW.score;
+                case "Y" -> WIN.score;
+                default -> LOSE.score;
             };
             case "B" -> switch (me) {
-                case "X" -> LOSE.value;
-                case "Y" -> DRAW.value;
-                default -> WIN.value;
+                case "X" -> LOSE.score;
+                case "Y" -> DRAW.score;
+                default -> WIN.score;
             };
             default -> switch (me) {
-                case "X" -> WIN.value;
-                case "Y" -> LOSE.value;
-                default -> DRAW.value;
+                case "X" -> WIN.score;
+                case "Y" -> LOSE.score;
+                default -> DRAW.score;
             };
         };
     }
