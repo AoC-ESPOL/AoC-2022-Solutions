@@ -6,8 +6,8 @@ def get_data(file):
             procedures = []
             info_index = {"rows": {}, "stack_number": {}}
             for line in lines:
+                line = line.strip("\n")
                 if "move" in line or "from" in line or "to" in line:
-                    line = line.strip()
                     info_procedure = line.split(" ")
                     procedures.append({"move":int(info_procedure[info_procedure.index("move")+1]),
                                         "from":info_procedure[info_procedure.index("from")+1],
