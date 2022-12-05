@@ -2,3 +2,4 @@ dist-newstyle
 puzzle-inputs
 tags
 build
+*.txt

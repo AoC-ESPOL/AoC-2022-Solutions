@@ -9,7 +9,7 @@ public abstract class Aoc<P1, P2> {
   public Aoc() {
     try {
       var path = getClass().getResource("/" + inputFileName()).toURI();
-      this.input =  Files.readString(Paths.get(path));
+      this.input = Files.readString(Paths.get(path));
     } catch (Exception ex) {
       throw new RuntimeException(ex);
     }

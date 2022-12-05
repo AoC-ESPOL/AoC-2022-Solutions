@@ -1,11 +1,12 @@
 package io.github.aloussase.aoc;
 
-import java.util.*;
-import java.util.regex.*;
-import java.util.stream.Collectors;
 import static java.util.function.Predicate.*;
 import static java.util.stream.IntStream.range;
 import static java.util.stream.Stream.iterate;
+
+import java.util.*;
+import java.util.regex.*;
+import java.util.stream.Collectors;
 
 final public class DayFive extends Aoc<String, String> {
   private List<String> drawing;
@@ -28,15 +29,16 @@ final public class DayFive extends Aoc<String, String> {
 
     this.drawing = parts[0].lines().toList();
     this.moves = parts[1].lines().toList();
-    this.numberOfStacks = Arrays.asList(drawing.get(drawing.size() - 1).split(" "))
-      .stream()
-      .filter(not(String::isEmpty))
-      .count();
+    this.numberOfStacks =
+        Arrays.asList(drawing.get(drawing.size() - 1).split(" "))
+            .stream()
+            .filter(not(String::isEmpty))
+            .count();
     this.stacks = new ArrayList<>((int)numberOfStacks);
 
     range(0, (int)numberOfStacks)
-      .mapToObj(i -> new ArrayDeque<Character>())
-      .forEach(stacks::add);
+        .mapToObj(i -> new ArrayDeque<Character>())
+        .forEach(stacks::add);
   }
 
   private void fillStacks() {
@@ -44,23 +46,22 @@ final public class DayFive extends Aoc<String, String> {
     for (var line : drawing) {
       var crates = parseLine(line);
       range(0, (int)numberOfStacks)
-        .filter(i -> crates.get(i) != ' ')
-        .forEach(i -> stacks.get(i).addLast(crates.get(i)));
+          .filter(i -> crates.get(i) != ' ')
+          .forEach(i -> stacks.get(i).addLast(crates.get(i)));
     }
   }
 
   public List<Character> parseLine(final String line) {
     return iterate(0, pos -> pos < line.length(), pos -> pos + 4)
-      .map(pos -> line.charAt(pos) == '[' ? line.charAt(pos + 1) : ' ')
-      .collect(Collectors.toList());
+        .map(pos -> line.charAt(pos) == '[' ? line.charAt(pos + 1) : ' ')
+        .collect(Collectors.toList());
   }
 
   private String getItemsOnTopOfEachStack() {
-    return stacks
-      .stream()
-      .map(ArrayDeque::removeFirst)
-      .map(Object::toString)
-      .collect(Collectors.joining());
+    return stacks.stream()
+        .map(ArrayDeque::removeFirst)
+        .map(Object::toString)
+        .collect(Collectors.joining());
   }
 
   @Override
