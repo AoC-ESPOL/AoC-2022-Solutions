@@ -64,18 +64,24 @@ final public class DayFive extends Aoc<String, String> {
         .collect(Collectors.joining());
   }
 
+  private static record Move(int quantity, int src, int dest) {
+    public static Move parse(String line) {
+      var xs = line.split(" ");
+      var n = Integer.parseInt(xs[1]);
+      var src = Integer.parseInt(xs[3]) - 1;
+      var dest = Integer.parseInt(xs[5]) - 1;
+      return new Move(n, src, dest);
+    }
+  }
+
   @Override
   public String partOne() {
     fillStacks();
 
     for (var line : moves) {
-      var xs = line.split(" ");
-      var n = Integer.parseInt(xs[1]);
-      var src = Integer.parseInt(xs[3]) - 1;
-      var dest = Integer.parseInt(xs[5]) - 1;
-
-      for (int i = 0; i < n; i++) {
-        stacks.get(dest).addFirst(stacks.get(src).removeFirst());
+      var move = Move.parse(line);
+      for (int i = 0; i < move.quantity(); i++) {
+        stacks.get(move.dest()).addFirst(stacks.get(move.src()).removeFirst());
       }
     }
 
@@ -87,19 +93,16 @@ final public class DayFive extends Aoc<String, String> {
     fillStacks();
 
     for (var line : moves) {
-      var xs = line.split(" ");
-      var n = Integer.parseInt(xs[1]);
-      var src = Integer.parseInt(xs[3]) - 1;
-      var dest = Integer.parseInt(xs[5]) - 1;
+      var move = Move.parse(line);
 
       ArrayDeque<Character> d = new ArrayDeque<>();
 
-      for (int i = 0; i < n; i++) {
-        d.addLast(stacks.get(src).removeFirst());
+      for (int i = 0; i < move.quantity(); i++) {
+        d.addLast(stacks.get(move.src()).removeFirst());
       }
 
       while (!d.isEmpty()) {
-        stacks.get(dest).addFirst(d.removeLast());
+        stacks.get(move.dest()).addFirst(d.removeLast());
       }
     }
 
