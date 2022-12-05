@@ -1,9 +1,15 @@
 module Aoc.Day.One.Common where
 
-import           Data.Text (Text)
-import qualified Data.Text as T
+import           Aoc.Util
+
+import           Data.Attoparsec.Text
+import           Data.Text            (Text)
+
+groupP :: Parser [Int]
+groupP = many1 (decimal <* endOfLine)
+
+groupsP :: Parser [[Int]]
+groupsP = groupP `sepBy` char '\n'
 
 parseInput :: Text -> IO [[Int]]
-parseInput input = do
-  let groups = map (T.splitOn "\n") $ T.splitOn "\n\n" input
-  return $ map (map (read . T.unpack) . filter (not . T.null)) groups
+parseInput = pure . runParser groupsP

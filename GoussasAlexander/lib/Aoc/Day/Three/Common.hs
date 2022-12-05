@@ -1,9 +1,12 @@
 module Aoc.Day.Three.Common where
 
+import           Aoc.Util
+
+import           Data.Attoparsec.Text
 import           Data.Char
-import           Data.List (intersect)
-import           Data.Text (Text)
-import qualified Data.Text as T
+import           Data.Functor
+import           Data.Text            (Text)
+import qualified Data.Text            as T
 
 -- Each rucksack has two compartments
 -- Items of a given type are meant to go in one of them
@@ -13,15 +16,11 @@ type Compartment = [Item]
 type Rucksack = (Compartment, Compartment)
 
 parseInput :: Text -> [Rucksack]
-parseInput = map getCompartments . lines . T.unpack
+parseInput = runParser $ many1 rucksackP
 
-getCompartments :: [Item] -> Rucksack
-getCompartments items =
-  let n = length items `div` 2
-   in splitAt n items
-
-getMisplacedItem :: Rucksack -> Item
-getMisplacedItem = head . uncurry intersect
+rucksackP :: Parser Rucksack
+rucksackP = lineP <&> \line ->
+  splitAt (T.length line `div` 2) $ T.unpack line
 
 getItemPriority :: Item -> Int
 getItemPriority item
