@@ -28,7 +28,10 @@ final public class DayFive extends Aoc<String, String> {
 
     this.drawing = parts[0].lines().toList();
     this.moves = parts[1].lines().toList();
-    this.numberOfStacks = getNumberOfStacks(drawing);
+    this.numberOfStacks = Arrays.asList(drawing.get(drawing.size() - 1).split(" "))
+      .stream()
+      .filter(not(String::isEmpty))
+      .count();
     this.stacks = new ArrayList<>((int)numberOfStacks);
 
     range(0, (int)numberOfStacks)
@@ -52,20 +55,6 @@ final public class DayFive extends Aoc<String, String> {
       .collect(Collectors.toList());
   }
 
-  private Optional<Character> parseCrate(String crate) {
-    if (crate.isEmpty()) return Optional.empty();
-    return  crate.charAt(0) == '['
-        ? Optional.of(crate.charAt(1))
-        : Optional.empty();
-  }
-
-  private long getNumberOfStacks(List<String> drawing) {
-    return Arrays.asList(drawing.get(drawing.size() - 1).split(" "))
-      .stream()
-      .filter(not(String::isEmpty))
-      .count();
-  }
-
   private String getItemsOnTopOfEachStack() {
     return stacks
       .stream()
@@ -73,7 +62,6 @@ final public class DayFive extends Aoc<String, String> {
       .map(Object::toString)
       .collect(Collectors.joining());
   }
-
 
   @Override
   public String partOne() {
