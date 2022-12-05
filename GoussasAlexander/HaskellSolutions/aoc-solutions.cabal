@@ -79,8 +79,9 @@ test-suite test-solutions
           , aoc-solutions
           , hspec
           , text
+          , vector
     default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    default-extensions: OverloadedStrings, TypeApplications
 
 
 executable aoc

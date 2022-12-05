@@ -10,7 +10,7 @@ import           Data.Proxy
 data DayFive
 
 instance Aoc (Proxy DayFive) where
-  type Result (Proxy DayFive) = (Int, Int)
+  type Result (Proxy DayFive) = ([Char], [Char])
 
   solution _ input =
     tupled
