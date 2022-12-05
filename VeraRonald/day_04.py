@@ -17,16 +17,16 @@ def get_data(file):
 def is_fully_contain(section_pair):
     return section_pair[0].issubset(section_pair[1]) or section_pair[1].issubset(section_pair[0])
 
-def is_partial_overlap(section_pair):
-    return len(section_pair[0] & section_pair[1]) != 0
+def is_overlap(section_pair):
+    return len(get_overlap_sections(section_pair)) != 0
 
 def get_overlap_sections(section_pair):
     return section_pair[0] & section_pair[1]
 
 # PART 1
 total_fully_overlap_assignments = sum([1 for section_pair in get_data("input.txt") if is_fully_contain(section_pair)])
-print(total_overlap_assignments)
+print(total_fully_overlap_assignments)
 
 # PART 2
-total_overlap_sections = sum([1 for section_pair in get_data("input.txt") if is_partial_overlap(section_pair)])
+total_overlap_sections = sum([1 for section_pair in get_data("input.txt") if is_overlap(section_pair)])
 print(total_overlap_sections)
