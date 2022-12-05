@@ -5,7 +5,7 @@ import java.util.Set;
 
 public class Common {
 
-    public static Set<Integer> createSetOfNumbers(String range) {
+    public static Set<Integer> createSetOfRangeOfNumbers(String range) {
 
         String[] rangeOfNumbers = range.split("-");
         int start = Integer.parseInt(rangeOfNumbers[0]);
@@ -20,7 +20,7 @@ public class Common {
     }
 
     public static void main(String[] args) {
-        System.out.println(createSetOfNumbers("2-4"));
+        System.out.println(createSetOfRangeOfNumbers("2-4"));
     }
 
 }

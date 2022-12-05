@@ -35,10 +35,10 @@ public class Common {
     public enum RESULT {
         WIN(6), DRAW(3), LOSE(0);
 
-        public int value;
+        public int score;
 
-        RESULT(int value) {
-            this.value = value;
+        RESULT(int score) {
+            this.score = score;
         }
     }
 }

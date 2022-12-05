@@ -15,8 +15,8 @@ public class PartOne implements Aoc<Integer> {
 
         for (String s : listOfRucksacks) {
             List<String> rucksack = Arrays.stream(s.split("")).toList();
-            Set<String> r1 = new HashSet<>(rucksack.subList(0, rucksack.size() / 2));
-            Set<String> r2 = new HashSet<>(rucksack.subList(rucksack.size() / 2, rucksack.size()));
+            Set<String> r1 = new HashSet<>(rucksack.subList(0, rucksack.size() >> 1));
+            Set<String> r2 = new HashSet<>(rucksack.subList(rucksack.size() >> 1, rucksack.size()));
             r1.retainAll(r2);
             itemRepeated.addAll(r1);
         }

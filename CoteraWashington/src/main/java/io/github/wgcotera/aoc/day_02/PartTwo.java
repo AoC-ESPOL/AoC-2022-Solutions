@@ -4,6 +4,7 @@ import io.github.wgcotera.aoc.Aoc;
 
 import java.util.List;
 
+import static io.github.wgcotera.aoc.day_02.Common.RESULT.*;
 import static io.github.wgcotera.aoc.day_02.Common.createListOfPlay;
 import static io.github.wgcotera.aoc.day_02.Common.letterValue;
 
@@ -19,17 +20,17 @@ public class PartTwo implements Aoc<Integer> {
                 case "A" -> "C";
                 case "B" -> "A";
                 default -> "B";
-            });
+            } + LOSE.score);
             case "Y" -> letterValue(switch (op) {
                 case "A" -> "A";
                 case "B" -> "B";
                 default -> "C";
-            }) + 3;
+            }) + DRAW.score;
             default -> letterValue(switch (op) {
                 case "A" -> "B";
                 case "B" -> "C";
                 default -> "A";
-            }) + 6;
+            }) + WIN.score;
         };
     }
 
