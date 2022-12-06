@@ -1,11 +1,12 @@
 #![allow(unused)]
 
+use bstr::ByteSlice;
 use itertools::Itertools;
 use ndarray::{array, s, Array2};
 use nom::{
     branch::alt,
     bytes::complete::{is_not, tag},
-    character::complete::{alpha1, digit1, i64},
+    character::complete::{alpha1, digit1, i64, u32},
     combinator::value,
     sequence::{delimited, preceded, terminated, tuple},
     IResult,
@@ -19,9 +20,10 @@ pub fn part1(input: &str) -> String {
     // input
     //     .lines()
     //     .map(|line| parse_line(line).unwrap().1)
-    //     .for_each(|v| println!("{v:?}"));
+    //     .map(|v| v)
+    //     .count();
     // let input = input.trim_end();
-    0.to_string()
+    todo!()
 }
 
 pub fn part2(_input: &str) -> String {
@@ -33,7 +35,6 @@ pub fn part2(_input: &str) -> String {
 //     Ok((rest, _))
 // }
 
-
 #[cfg(test)]
 mod tests {
     use super::{part1, part2};
@@ -43,15 +44,15 @@ mod tests {
 
     #[test]
     fn part1_works() {
-        let output = 24000.to_string(); // <-- change output
+        let output = 24000.to_string();
 
         assert_eq!(part1(TEST_INPUT), output);
     }
 
-    #[test]
-    fn part2_works() {
-        let output = 45000.to_string(); // <-- change output
+    // #[test]
+    // fn part2_works() {
+    //     let output = 45000.to_string();
 
-        assert_eq!(part2(TEST_INPUT), output);
-    }
+    //     assert_eq!(part2(TEST_INPUT), output);
+    // }
 }

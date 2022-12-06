@@ -2,6 +2,7 @@
 
 use std::fs;
 
+use arboard::Clipboard;
 use clap::Parser;
 use color_eyre::{
     eyre::{ensure, WrapErr},
@@ -35,6 +36,9 @@ fn main() -> Result<()> {
     let result = solve(day, part, &input);
 
     println!("{result}");
+
+    Clipboard::new()?.set_text(&result)?;
+
     Ok(())
 }
 
