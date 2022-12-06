@@ -6,15 +6,16 @@ pub fn part1(input: &str) -> String {
     let mut stacks = parse_crates(crates.as_bytes());
 
     for (amount, from, to) in moves.lines().map(|line| parse_move(line).unwrap().1) {
-        let split_idx = stacks[from].len() - amount;
-        let mut extracted = stacks[from].split_off(split_idx);
-        extracted.reverse();
-        stacks[to].extend_from_slice(&extracted);
+        let (from, to) = get_mut_2(&mut stacks, from, to);
+
+        let split_idx = from.len() - amount;
+        to.extend(from[split_idx..].iter().rev());
+        from.truncate(split_idx);
     }
 
     stacks
         .into_iter()
-        .map(|mut stack| stack.pop().unwrap())
+        .map(|mut stack| stack.pop().unwrap() as char)
         .collect()
 }
 
@@ -23,26 +24,27 @@ pub fn part2(input: &str) -> String {
     let mut stacks = parse_crates(crates.as_bytes());
 
     for (amount, from, to) in moves.lines().map(|line| parse_move(line).unwrap().1) {
-        let split_idx = stacks[from].len() - amount;
-        let extracted = stacks[from].split_off(split_idx);
-        // extracted.reverse();
-        stacks[to].extend_from_slice(&extracted);
+        let (from, to) = get_mut_2(&mut stacks, from, to);
+
+        let split_idx = from.len() - amount;
+        to.extend_from_slice(&from[split_idx..]);
+        from.truncate(split_idx);
     }
 
     stacks
         .into_iter()
-        .map(|mut stack| stack.pop().unwrap())
+        .map(|mut stack| stack.pop().unwrap() as char)
         .collect()
 }
 
-fn parse_crates(input: &[u8]) -> Vec<Vec<char>> {
+fn parse_crates(input: &[u8]) -> Vec<Vec<u8>> {
     const BLOCK_LEN: usize = "[_] ".len();
 
     let width = input.find("\n").unwrap() + "\n".len();
     let cols = width / BLOCK_LEN;
     let rows = input.len() / width;
 
-    let mut stacks = vec![Vec::<char>::with_capacity(rows); cols];
+    let mut stacks = vec![Vec::with_capacity(rows); cols];
 
     for (col_idx, curr_stack) in stacks.iter_mut().enumerate().take(cols) {
         for current_row in 1..=rows {
@@ -51,11 +53,12 @@ fn parse_crates(input: &[u8]) -> Vec<Vec<char>> {
             let chars_in_rows_before = rows_before * width;
             let current_position = chars_in_rows_before + col_position + "[".len();
 
-            let current_char = input[current_position] as char;
+            let current_char = input[current_position];
 
-            if current_char != ' ' {
-                curr_stack.push(current_char);
+            if current_char == b' ' {
+                break;
             }
+            curr_stack.push(current_char);
         }
     }
 
@@ -67,6 +70,16 @@ fn parse_move(input: &str) -> IResult<&str, (usize, usize, usize)> {
         tuple((tag("move "), u32, tag(" from "), u32, tag(" to "), u32))(input)?;
     // Subtract 1 to use as an index
     Ok((rest, (a as usize, b as usize - 1, c as usize - 1)))
+}
+
+fn get_mut_2<T>(arr: &mut [T], a0: usize, a1: usize) -> (&mut T, &mut T) {
+    if a0 < a1 {
+        let [first, .., second] = &mut arr[a0..=a1] else { unreachable!() };
+        (first, second)
+    } else {
+        let [second, .., first] = &mut arr[a1..=a0] else { unreachable!() };
+        (first, second)
+    }
 }
 
 #[cfg(test)]
