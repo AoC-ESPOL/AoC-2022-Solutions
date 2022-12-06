@@ -1,6 +1,4 @@
-# Part 1
-
-def rucksack1(path):
+def dia1_p1(path):
   file = open(path, "r")
   res = []
   for line in file:
@@ -23,7 +21,7 @@ def rucksack1(path):
         break
   return sum(res)
         
-def rucksack2(path):
+def dia2_p2(path):
   file = open(path, "r")
   res = 0
   tmp = []

@@ -1,6 +1,4 @@
-# Part 1
-
-def get_high_score1(path):
+def dia2_p1(path):
   enemy_shape = ["A", "B", "C"]
   player_shape = ["X", "Y", "Z"]
   values = [1, 2, 3]
@@ -20,9 +18,7 @@ def get_high_score1(path):
     total += act_round
   return total
 
-# Part 2
-
-def get_high_score2(path):
+def dia2_p2(path):
   enemy_shape = ["A", "B", "C"]
   values = [1, 2, 3]
   file = open(path, "r")

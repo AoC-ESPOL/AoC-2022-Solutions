@@ -1,6 +1,4 @@
-# Part 1
-
-def get_most_elve(path):
+def dia1_p1(path):
   file = open(path, "r")
   max_value = 0
   curr = 0
@@ -12,9 +10,7 @@ def get_most_elve(path):
       max_value = max(curr, max_value)
   return max_value
 
-# Part 2
-
-def get_top_elve(path):
+def dia2_p2(path):
   file = open(path, "r")
   elve_calories = []
   max_value = 0
