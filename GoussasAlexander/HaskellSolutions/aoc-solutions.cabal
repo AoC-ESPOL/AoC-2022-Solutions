@@ -28,6 +28,10 @@ library
         , Aoc.Day.Four.PartTwo
         , Aoc.Day.Four.Common
         , Aoc.Day.Four.Solution
+        , Aoc.Day.Five.PartOne
+        , Aoc.Day.Five.PartTwo
+        , Aoc.Day.Five.Common
+        , Aoc.Day.Five.Solution
         , Aoc.Class
         , Aoc.Util
         , Aoc.Input
@@ -69,13 +73,15 @@ test-suite test-solutions
         , DayTwoSpec
         , DayThreeSpec
         , DayFourSpec
+        , DayFiveSpec
     build-depends:
             base ^>=4.15.1.0
           , aoc-solutions
           , hspec
           , text
+          , vector
     default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    default-extensions: OverloadedStrings, TypeApplications
 
 
 executable aoc
