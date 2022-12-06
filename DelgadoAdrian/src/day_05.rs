@@ -73,13 +73,12 @@ fn parse_move(input: &str) -> IResult<&str, (usize, usize, usize)> {
 }
 
 fn get_mut_2<T>(arr: &mut [T], a0: usize, a1: usize) -> (&mut T, &mut T) {
-    assert!(a0 != a1);
-    // SAFETY: this is safe because we know a0 != a1
-    unsafe {
-        (
-            &mut *std::ptr::addr_of_mut!(arr[a0]),
-            &mut *std::ptr::addr_of_mut!(arr[a1]),
-        )
+    if a0 < a1 {
+        let [first, .., second] = &mut arr[a0..=a1] else { unreachable!() };
+        (first, second)
+    } else {
+        let [second, .., first] = &mut arr[a1..=a0] else { unreachable!() };
+        (first, second)
     }
 }
 
