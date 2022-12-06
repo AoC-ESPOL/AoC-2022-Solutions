@@ -4,11 +4,11 @@ s2 = 0
 for line in lines:
     line = line.strip()
     x,y = line.split(',')
-    x = x.split("-")
-    y = y.split("-")
-    if int(x[0]) <= int(y[0]) and int(y[1]) >= int(y[1]) or int(x[0]) >= int(y[0]) and int(x[1]) <= int(y[1]):
+    x1,x2 = [int(x) for x in x.split("-")]
+    y1,y2 = [int(y) for y in y.split("-")]
+    if x1<=y1 and x2>=y2 or y1<=x1 and y2>=x2:
         s1+=1
-    if int(y[0]) <= int(x[1]) and int(y[1]) >= int(x[0]):
+    if y1<=x2 and y2>=x1:
         s2+=1 
 print(s1)
 print(s2)
