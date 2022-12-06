@@ -1,25 +1,23 @@
 use std::collections::HashSet;
 
 pub fn part1(input: &str) -> usize {
-    const SIZE: usize = 4;
-
-    input
-        .as_bytes()
-        .windows(SIZE)
-        .position(|win| win.iter().collect::<HashSet<_>>().len() == SIZE)
-        .unwrap()
-        + SIZE
+    n_different(input, 4)
 }
 
 pub fn part2(input: &str) -> usize {
-    const SIZE: usize = 14;
+    n_different(input, 14)
+}
 
+fn n_different(input: &str, size: usize) -> usize {
     input
         .as_bytes()
-        .windows(SIZE)
-        .position(|win| win.iter().collect::<HashSet<_>>().len() == SIZE)
+        .windows(size)
+        .position(|win| {
+            let mut set = HashSet::with_capacity(size);
+            win.iter().all(|c| set.insert(c)) // shortcircuit
+        })
         .unwrap()
-        + SIZE
+        + size
 }
 
 #[cfg(test)]
