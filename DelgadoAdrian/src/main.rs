@@ -3,25 +3,14 @@
 use std::fs;
 
 use arboard::Clipboard;
-use clap::Parser;
 use color_eyre::{
     eyre::{ensure, WrapErr},
     Result,
 };
 use time::{macros::datetime, OffsetDateTime};
 
-/// Solve an Advent of Code problem
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    /// Day of the problem
-    #[arg(value_parser = clap::value_parser!(u8).range(1..=25))]
-    day: u8,
-
-    /// Part of the problem
-    #[arg(value_parser = clap::value_parser!(u8).range(1..=2))]
-    part: u8,
-}
+mod flags;
+use flags::Problem;
 
 fn main() -> Result<()> {
     // Nice and colorful errors
@@ -29,7 +18,10 @@ fn main() -> Result<()> {
     // Get session cookie from env file
     dotenvy::dotenv()?;
 
-    let Args { day, part } = Args::parse();
+    let Problem { day, part } = Problem::from_env()?;
+
+    ensure!((1..=25).contains(&day), "Day must be between 1 and 25");
+    ensure!((1..=2).contains(&part), "Part must 1 or 2");
 
     let input = get_problem(day)?;
 
