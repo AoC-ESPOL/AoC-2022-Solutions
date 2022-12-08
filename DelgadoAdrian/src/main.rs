@@ -1,6 +1,6 @@
 #![allow(clippy::must_use_candidate, clippy::missing_panics_doc)]
 
-use std::fs;
+use std::{fs, time::Instant};
 
 use arboard::Clipboard;
 use color_eyre::{
@@ -75,12 +75,22 @@ fn get_problem(day: u8) -> Result<String> {
     Ok(response)
 }
 
+fn timing_fn<T, F>(f: F) -> T
+where
+    F: Fn() -> T,
+{
+    let now = Instant::now();
+    let ret = f();
+    println!("Finished in {} μs", now.elapsed().as_micros());
+    ret
+}
+
 macro_rules! match_solvers {
     (($curr_day:ident, $curr_part:ident, $input:ident) , [$(($day:literal,$module:ident)),+ $(,)?]) => {
         match ($curr_day, $curr_part) {
         $(
-            ($day, 1) => $module::part1($input).to_string(),
-            ($day, 2) => $module::part2($input).to_string(),
+            ($day, 1) => timing_fn(|| $module::part1($input)).to_string(),
+            ($day, 2) => timing_fn(|| $module::part2($input)).to_string(),
         )+
             _ => unreachable!(),
         }
