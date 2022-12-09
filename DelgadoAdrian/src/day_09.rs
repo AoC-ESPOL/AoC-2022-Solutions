@@ -97,6 +97,10 @@ U 20";
     #[test]
     #[ignore]
     fn part2_works() {
+        let output = 1;
+
+        assert_eq!(part2(TEST_INPUT_1), output);
+
         let output = 36;
 
         assert_eq!(part2(TEST_INPUT_2), output);
