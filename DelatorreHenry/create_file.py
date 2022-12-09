@@ -1,5 +1,5 @@
 
-for i in range(7,26):
+for i in range(1,26):
     if i<10:
         file_name = "day_0"+str(i)+".py"
     else:
