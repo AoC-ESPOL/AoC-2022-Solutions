@@ -6,36 +6,26 @@ use nom::{
 };
 
 pub fn part1(input: &str) -> usize {
-    let mut positions_tail = HashSet::new();
-    let mut snake = [[0; 2]; 2]; // head 0, tail 1
-
-    for (dir, n) in input.lines().map(|line| parse_line(line).unwrap().1) {
-        for _ in 0..n {
-            let [ref mut head, ref mut tail] = snake;
-
-            add_inplace(head, dir);
-            update_snake_mut(tail, *head);
-
-            positions_tail.insert(*tail);
-        }
-    }
-
-    positions_tail.len()
+    simulate_snake::<2>(input)
 }
 
 pub fn part2(input: &str) -> usize {
+    simulate_snake::<10>(input)
+}
+
+fn simulate_snake<const LEN_SNAKE: usize>(input: &str) -> usize {
     let mut positions_tail = HashSet::new();
-    let mut snake = [[0; 2]; 10]; // head 0, tail 9
+    let mut snake = [[0; 2]; LEN_SNAKE]; // [head, .., tail]
     for (dir, n) in input.lines().map(|line| parse_line(line).unwrap().1) {
         for _ in 0..n {
             add_inplace(&mut snake[0], dir);
 
-            for idx in 1..snake.len() {
+            for idx in 1..LEN_SNAKE {
                 let previous = snake[idx - 1];
                 update_snake_mut(&mut snake[idx], previous);
             }
 
-            positions_tail.insert(snake[9]);
+            positions_tail.insert(snake[LEN_SNAKE - 1]);
         }
     }
 
