@@ -1,95 +1,97 @@
 const std = @import("std");
 const Grid = @import("./grid.zig");
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+var allocator = gpa.allocator();
 
 fn charToInt(c: u8) i32 {
     return c - '0';
 }
 
 pub fn partOne(input: []const u8) !usize {
-    var grid = try Grid.fromString(i32, charToInt, input);
-    var visibleTrees = grid.rows * 2 + (grid.cols - 2) * 2;
+    var grid = try Grid.fromString(i32, allocator, charToInt, input);
+    defer grid.deinit();
 
-    var i: usize = 1;
-    while (i < grid.rows - 1) : (i += 1) {
-        var j: usize = 1;
-        while (j < grid.cols - 1) : (j += 1) {
-            const currentItem = grid.get(i, j);
-            var idx = @intCast(i32, i - 1);
-            var isVisible = false;
+    var gridIterator = grid.iterator();
+    var visibleTrees: usize = 0;
 
-            // Check up
-            while (idx >= 0 and grid.get(@intCast(usize, idx), j) < currentItem) : (idx -= 1) {}
-            isVisible = isVisible or idx < 0;
+    while (gridIterator.next()) |gridItem| {
+        const i: usize = gridItem.row;
+        const j: usize = gridItem.col;
+        const item: i32 = gridItem.item.*;
 
-            // Check down
-            idx = @intCast(i32, i + 1);
-            while (!isVisible and idx < grid.rows and grid.get(@intCast(usize, idx), j) < currentItem) : (idx += 1) {}
-            isVisible = isVisible or idx == grid.rows;
+        var idx: i32 = undefined;
+        var isVisible = false;
 
-            // Check left
-            idx = @intCast(i32, j - 1);
-            while (!isVisible and idx >= 0 and grid.get(i, @intCast(usize, idx)) < currentItem) : (idx -= 1) {}
-            isVisible = isVisible or idx < 0;
+        // Check up
+        idx = @intCast(i32, @intCast(i32, i) - 1);
+        while (idx >= 0 and grid.get(@intCast(usize, idx), j) < item) : (idx -= 1) {}
+        isVisible = isVisible or idx < 0;
 
-            // Check right
-            idx = @intCast(i32, j + 1);
-            while (!isVisible and idx < grid.cols and grid.get(i, @intCast(usize, idx)) < currentItem) : (idx += 1) {}
-            isVisible = isVisible or idx == grid.cols;
+        // Check down
+        idx = @intCast(i32, i + 1);
+        while (!isVisible and idx < grid.rows and grid.get(@intCast(usize, idx), j) < item) : (idx += 1) {}
+        isVisible = isVisible or idx == grid.rows;
 
-            visibleTrees += if (isVisible) 1 else 0;
-        }
+        // Check left
+        idx = @intCast(i32, @intCast(i32, j) - 1);
+        while (!isVisible and idx >= 0 and grid.get(i, @intCast(usize, idx)) < item) : (idx -= 1) {}
+        isVisible = isVisible or idx < 0;
+
+        // Check right
+        idx = @intCast(i32, j + 1);
+        while (!isVisible and idx < grid.cols and grid.get(i, @intCast(usize, idx)) < item) : (idx += 1) {}
+        isVisible = isVisible or idx == grid.cols;
+
+        visibleTrees += if (isVisible) 1 else 0;
     }
 
     return visibleTrees;
 }
 
 pub fn partTwo(input: []const u8) !usize {
-    var grid = try Grid.fromString(i32, charToInt, input);
-
+    var grid = try Grid.fromString(i32, allocator, charToInt, input);
+    var gridIterator = grid.iterator();
     var maxScenicScore: usize = 0;
-    var i: i32 = 1;
 
-    while (i < grid.rows - 1) : (i += 1) {
-        var j: i32 = 1;
-        while (j < grid.cols - 1) : (j += 1) {
-            const currentItem = grid.get(@intCast(usize, i), @intCast(usize, j));
-            var treeScenicScore = [_]usize{0} ** 4;
+    while (gridIterator.next()) |gridItem| {
+        const i: usize = gridItem.row;
+        const j: usize = gridItem.col;
+        const item = gridItem.item.*;
 
-            var idx = i - 1;
-            // Check up
-            while (idx >= 0) : (idx -= 1) {
-                treeScenicScore[0] += 1;
-                if (grid.get(@intCast(usize, idx), @intCast(usize, j)) >= currentItem)
-                    break;
-            }
+        var treeScenicScore = [_]usize{0} ** 4;
+        var idx: i32 = undefined;
 
-            // Check down
-            idx = i + 1;
-            while (idx < grid.rows) : (idx += 1) {
-                treeScenicScore[1] += 1;
-                if (grid.get(@intCast(usize, idx), @intCast(usize, j)) >= currentItem)
-                    break;
-            }
-
-            // Check left
-            idx = j - 1;
-            while (idx >= 0) : (idx -= 1) {
-                treeScenicScore[2] += 1;
-                if (grid.get(@intCast(usize, i), @intCast(usize, idx)) >= currentItem)
-                    break;
-            }
-
-            // Check right
-            idx = j + 1;
-            while (idx < grid.cols) : (idx += 1) {
-                treeScenicScore[3] += 1;
-                if (grid.get(@intCast(usize, i), @intCast(usize, idx)) >= currentItem)
-                    break;
-            }
-
-            const score = treeScenicScore[0] * treeScenicScore[1] * treeScenicScore[2] * treeScenicScore[3];
-            maxScenicScore = std.math.max(maxScenicScore, score);
+        // Check up
+        idx = @intCast(i32, i) - 1;
+        while (idx >= 0) : (idx -= 1) {
+            treeScenicScore[0] += 1;
+            if (grid.get(@intCast(usize, idx), j) >= item) break;
         }
+
+        // Check down
+        idx = @intCast(i32, i) + 1;
+        while (idx < grid.rows) : (idx += 1) {
+            treeScenicScore[1] += 1;
+            if (grid.get(@intCast(usize, idx), j) >= item) break;
+        }
+
+        // Check left
+        idx = @intCast(i32, j) - 1;
+        while (idx >= 0) : (idx -= 1) {
+            treeScenicScore[2] += 1;
+            if (grid.get(i, @intCast(usize, idx)) >= item) break;
+        }
+
+        // Check right
+        idx = @intCast(i32, j) + 1;
+        while (idx < grid.cols) : (idx += 1) {
+            treeScenicScore[3] += 1;
+            if (grid.get(i, @intCast(usize, idx)) >= item) break;
+        }
+
+        const score = treeScenicScore[0] * treeScenicScore[1] * treeScenicScore[2] * treeScenicScore[3];
+        maxScenicScore = std.math.max(maxScenicScore, score);
+
     }
 
     return maxScenicScore;
