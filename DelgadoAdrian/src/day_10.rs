@@ -1,19 +1,11 @@
-#![allow(unused)]
-
-use bstr::ByteSlice;
 use itertools::Itertools;
-use ndarray::{array, s, Array2};
 use nom::{
     branch::alt,
-    bytes::complete::{is_not, tag},
-    character::complete::{alpha1, digit1, i64, u32},
+    bytes::complete::tag,
+    character::complete::i64,
     combinator::{map, value},
-    sequence::{delimited, preceded, separated_pair, terminated, tuple},
+    sequence::preceded,
     IResult,
-};
-use petgraph::{
-    algo::{all_simple_paths, toposort},
-    prelude::*,
 };
 
 pub fn part1(input: &str) -> i64 {
@@ -41,39 +33,32 @@ pub fn part1(input: &str) -> i64 {
     strength
 }
 
-pub fn part2(input: &str) -> i64 {
+pub fn part2(input: &str) -> String {
     // 40 wide and 6 high
     let mut x = 1;
     let mut cycle = 1;
-    let mut strength = 0;
-    let check = [20, 60, 100, 140, 180, 220];
-    let mut to_print = [[' '; 40]; 6];
+
+    let mut to_print = [["."; 40]; 6];
     for op in input.lines().map(|line| parse_line(line).unwrap().1) {
         if ((cycle - 1) % 40_i64).abs_diff(x) < 2 {
-            to_print[(cycle as usize - 1) / 40][(cycle as usize - 1) % 40] = '#'
+            to_print[(cycle as usize - 1) / 40][(cycle as usize - 1) % 40] = "#";
         }
         cycle += 1;
         match op {
             Op::Noop => {}
             Op::Addx(n) => {
-                if check.contains(&cycle) {
-                    strength += x * cycle;
-                }
                 if ((cycle - 1) % 40_i64).abs_diff(x) < 2 {
-                    to_print[(cycle as usize - 1) / 40][(cycle as usize - 1) % 40] = '#'
+                    to_print[(cycle as usize - 1) / 40][(cycle as usize - 1) % 40] = "#";
                 }
                 cycle += 1;
                 x += n;
             }
         }
-        if check.contains(&cycle) {
-            strength += x * cycle;
-        }
     }
-    for row in to_print {
-        println!("{}", row.into_iter().collect::<String>());
-    }
-    strength
+    to_print
+        .into_iter()
+        .map(|arr| String::from_iter(arr))
+        .join("\n")
 }
 
 fn parse_line(input: &str) -> IResult<&str, Op> {
@@ -241,16 +226,23 @@ noop
 noop";
 
     #[test]
+    #[ignore]
     fn part1_works() {
         let output = 13140;
 
         assert_eq!(part1(TEST_INPUT), output);
     }
 
-    // #[test]
-    // fn part2_works() {
-    //     let output = 45000.to_string();
+    #[test]
+    #[ignore]
+    fn part2_works() {
+        let output = "##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....";
 
-    //     assert_eq!(part2(TEST_INPUT), output);
-    // }
+        assert_eq!(part2(TEST_INPUT), output);
+    }
 }
