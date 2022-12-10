@@ -6,7 +6,8 @@ authors = ["Adrian Delgado <aoc2022@adrianjdelgado.com>"]
 
 
 [dependencies]
-clap = { version = "4.0.29", features = ["derive"] }
+arboard = { version = "3.2.0", default-features = false }
+bstr = "1.0.1"
 color-eyre = "0.6.2"
 dotenvy = "0.15.6"
 itertools = "0.10.5"
@@ -18,3 +19,4 @@ petgraph = "0.6.2"
 serde_json = "1.0.89"
 time = { version = "0.3.17", features = ["macros"] }
 ureq = { version = "2.5.0", features = ["cookies"] }
+xflags = "0.3.1"

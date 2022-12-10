@@ -4,7 +4,9 @@ import io.github.wgcotera.aoc.Aoc;
 
 import java.util.List;
 
+import static io.github.wgcotera.aoc.day_02.Common.RESULT.*;
 import static io.github.wgcotera.aoc.day_02.Common.createListOfPlay;
+import static io.github.wgcotera.aoc.day_02.Common.letterValue;
 
 public class PartTwo implements Aoc<Integer> {
 
@@ -12,23 +14,23 @@ public class PartTwo implements Aoc<Integer> {
     //    P     B 2 Y Draw
     //    S	    C 3 Z Win
 
-    public static int myPlayScore(String op, String result) {
-        return switch (op) {
-            case "A" -> switch (result) {
-                case "X" -> 3;
-                case "Y" -> 4;
-                default -> 8;
-            };
-            case "B" -> switch (result) {
-                case "X" -> 1;
-                case "Y" -> 5;
-                default -> 9;
-            };
-            default -> switch (result) {
-                case "X" -> 2;
-                case "Y" -> 6;
-                default -> 7;
-            };
+    public static int score(String op, String result) {
+        return switch (result) {
+            case "X" -> letterValue(switch (op) {
+                case "A" -> "C";
+                case "B" -> "A";
+                default -> "B";
+            } + LOSE.score);
+            case "Y" -> letterValue(switch (op) {
+                case "A" -> "A";
+                case "B" -> "B";
+                default -> "C";
+            }) + DRAW.score;
+            default -> letterValue(switch (op) {
+                case "A" -> "B";
+                case "B" -> "C";
+                default -> "A";
+            }) + WIN.score;
         };
     }
 
@@ -49,7 +51,7 @@ public class PartTwo implements Aoc<Integer> {
 
             String m = me.get(i);
             String o = op.get(i);
-            score += myPlayScore(o, m);
+            score += score(o, m);
 
         }
         return score;

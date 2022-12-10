@@ -1,26 +1,16 @@
 #![allow(clippy::must_use_candidate, clippy::missing_panics_doc)]
 
-use std::fs;
+use std::{fs, time::Instant};
 
-use clap::Parser;
+use arboard::Clipboard;
 use color_eyre::{
     eyre::{ensure, WrapErr},
     Result,
 };
 use time::{macros::datetime, OffsetDateTime};
 
-/// Solve an Advent of Code problem
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct Args {
-    /// Day of the problem
-    #[arg(value_parser = clap::value_parser!(u8).range(1..=25))]
-    day: u8,
-
-    /// Part of the problem
-    #[arg(value_parser = clap::value_parser!(u8).range(1..=2))]
-    part: u8,
-}
+mod flags;
+use flags::Problem;
 
 fn main() -> Result<()> {
     // Nice and colorful errors
@@ -28,13 +18,19 @@ fn main() -> Result<()> {
     // Get session cookie from env file
     dotenvy::dotenv()?;
 
-    let Args { day, part } = Args::parse();
+    let Problem { day, part } = Problem::from_env()?;
+
+    ensure!((1..=25).contains(&day), "Day must be between 1 and 25");
+    ensure!((1..=2).contains(&part), "Part must 1 or 2");
 
     let input = get_problem(day)?;
 
     let result = solve(day, part, &input);
 
     println!("{result}");
+
+    Clipboard::new()?.set_text(&result)?;
+
     Ok(())
 }
 
@@ -79,12 +75,22 @@ fn get_problem(day: u8) -> Result<String> {
     Ok(response)
 }
 
+fn timing_fn<T, F>(f: F) -> T
+where
+    F: Fn() -> T,
+{
+    let now = Instant::now();
+    let ret = f();
+    println!("Finished in {} μs", now.elapsed().as_micros());
+    ret
+}
+
 macro_rules! match_solvers {
     (($curr_day:ident, $curr_part:ident, $input:ident) , [$(($day:literal,$module:ident)),+ $(,)?]) => {
         match ($curr_day, $curr_part) {
         $(
-            ($day, 1) => $module::part1($input).to_string(),
-            ($day, 2) => $module::part2($input).to_string(),
+            ($day, 1) => timing_fn(|| $module::part1($input)).to_string(),
+            ($day, 2) => timing_fn(|| $module::part2($input)).to_string(),
         )+
             _ => unreachable!(),
         }

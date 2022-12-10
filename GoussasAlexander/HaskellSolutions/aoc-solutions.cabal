@@ -1,0 +1,107 @@
+cabal-version:      2.4
+name:               aoc-solutions
+version:            0.1.0.0
+synopsis:           Solutions to advent of code challenges
+-- bug-reports:
+license:            MIT
+-- author:
+-- maintainer:
+-- copyright:
+-- category:
+extra-source-files: README.md
+
+library
+    exposed-modules:
+          Aoc.Day.One.PartOne
+        , Aoc.Day.One.PartTwo
+        , Aoc.Day.One.Common
+        , Aoc.Day.One.Solution
+        , Aoc.Day.Two.PartOne
+        , Aoc.Day.Two.PartTwo
+        , Aoc.Day.Two.Common
+        , Aoc.Day.Two.Solution
+        , Aoc.Day.Three.PartOne
+        , Aoc.Day.Three.PartTwo
+        , Aoc.Day.Three.Common
+        , Aoc.Day.Three.Solution
+        , Aoc.Day.Four.PartOne
+        , Aoc.Day.Four.PartTwo
+        , Aoc.Day.Four.Common
+        , Aoc.Day.Four.Solution
+        , Aoc.Day.Five.PartOne
+        , Aoc.Day.Five.PartTwo
+        , Aoc.Day.Five.Common
+        , Aoc.Day.Five.Solution
+        , Aoc.Class
+        , Aoc.Util
+        , Aoc.Input
+        , Aoc.Types
+    build-depends:
+          base                 ^>=4.15.1.0
+        , array                >= 0.5.4 && < 0.6
+        , attoparsec           >= 0.14.4 && < 0.15
+        , bytestring           >= 0.10.12 && < 0.11
+        , containers           >= 0.6.4 && < 0.7
+        , primitive            >= 0.7.4 && < 0.8
+        , filepath             >= 1.4.2 && < 1.5
+        , text                 >= 1.2.5 && < 1.3
+        , unordered-containers >= 0.2.19 && < 0.3
+        , vector               >= 0.13.0 && < 0.14
+    hs-source-dirs:   lib
+    ghc-options: -Wall
+    default-language: Haskell2010
+    default-extensions: OverloadedStrings, TypeFamilies, LambdaCase, FlexibleInstances, TypeApplications
+
+executable aoc-runner
+   main-is: Main.hs
+   ghc-options: -Wunused-packages -Wall
+   -- other-modules:
+   build-depends:
+          base ^>=4.15.1.0
+        , aoc-solutions
+   hs-source-dirs: app
+   default-language: Haskell2010
+   default-extensions: OverloadedStrings, TypeApplications, TypeFamilies
+
+test-suite test-solutions
+    type: exitcode-stdio-1.0
+    ghc-options: -Wunused-packages -Wall
+    main-is: Spec.hs
+    hs-source-dirs: test
+    other-modules:
+          DayOneSpec
+        , DayTwoSpec
+        , DayThreeSpec
+        , DayFourSpec
+        , DayFiveSpec
+    build-depends:
+            base ^>=4.15.1.0
+          , aoc-solutions
+          , hspec
+          , text
+          , vector
+    default-language: Haskell2010
+    default-extensions: OverloadedStrings, TypeApplications
+
+
+executable aoc
+   main-is: Main.hs
+   ghc-options: -Wunused-packages -Wall
+   other-modules:
+        Aoc.Tool.Options
+      , Aoc.Tool.Gen
+      , Aoc.Tool.Print
+      , Aoc.Tool.Input
+   build-depends:
+          base                 ^>=4.15.1.0
+        , directory            >= 1.3.6 && < 1.4
+        , filepath             >= 1.4.2 && < 1.5
+        , optparse-applicative >= 0.17.0 && < 0.18
+        , req
+        , text
+        , dotenv
+        , bytestring
+        , utf8-string
+   hs-source-dirs: tool/aoc
+   default-language: Haskell2010
+   default-extensions: OverloadedStrings

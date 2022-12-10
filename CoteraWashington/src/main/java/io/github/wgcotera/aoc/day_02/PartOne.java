@@ -4,7 +4,9 @@ import io.github.wgcotera.aoc.Aoc;
 
 import java.util.List;
 
+import static io.github.wgcotera.aoc.day_02.Common.RESULT.*;
 import static io.github.wgcotera.aoc.day_02.Common.createListOfPlay;
+import static io.github.wgcotera.aoc.day_02.Common.letterValue;
 
 public class PartOne implements Aoc<Integer> {
 
@@ -13,21 +15,21 @@ public class PartOne implements Aoc<Integer> {
     //    S	    C 3 Z
 
     public static int myPlayScore(String op, String me) {
-        return switch (op) {
+        return letterValue(me) + switch (op) {
             case "A" -> switch (me) {
-                case "X" -> 4;
-                case "Y" -> 8;
-                default -> 3;
+                case "X" -> DRAW.score;
+                case "Y" -> WIN.score;
+                default -> LOSE.score;
             };
             case "B" -> switch (me) {
-                case "X" -> 1;
-                case "Y" -> 5;
-                default -> 9;
+                case "X" -> LOSE.score;
+                case "Y" -> DRAW.score;
+                default -> WIN.score;
             };
             default -> switch (me) {
-                case "X" -> 7;
-                case "Y" -> 2;
-                default -> 6;
+                case "X" -> WIN.score;
+                case "Y" -> LOSE.score;
+                default -> DRAW.score;
             };
         };
     }
