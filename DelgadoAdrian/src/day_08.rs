@@ -3,7 +3,7 @@ use ndarray_stats::QuantileExt;
 
 pub fn part1(input: &str) -> u32 {
     let size = input.find('\n').unwrap();
-    let grid = Array2::from_shape_vec((size, size), input.replace("\n", "").into_bytes()).unwrap();
+    let grid = Array2::from_shape_vec((size, size), input.replace('\n', "").into_bytes()).unwrap();
     let mut visible = Array2::zeros((size, size));
     for (x, row) in grid.rows().into_iter().enumerate() {
         set_visible::<false>(&mut visible, row, x);
@@ -41,7 +41,7 @@ fn set_visible<const TRANSPOSE: bool>(visible: &mut Array2<u32>, lane: ArrayView
 
 pub fn part2(input: &str) -> u32 {
     let size = input.find('\n').unwrap();
-    let grid = Array2::from_shape_vec((size, size), input.replace("\n", "").into_bytes()).unwrap();
+    let grid = Array2::from_shape_vec((size, size), input.replace('\n', "").into_bytes()).unwrap();
     let mut scores = Array2::ones((size, size));
     for (x, row) in grid.rows().into_iter().enumerate() {
         set_scores::<false>(&mut scores, row, x);

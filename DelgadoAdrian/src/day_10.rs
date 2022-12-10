@@ -1,76 +1,78 @@
+use bstr::ByteSlice;
 use itertools::Itertools;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::i64,
+    character::complete::i16,
     combinator::{map, value},
     sequence::preceded,
     IResult,
 };
 
-pub fn part1(input: &str) -> i64 {
+pub fn part1(input: &str) -> i16 {
     let mut x = 1;
-    let mut cycle = 1;
+    let mut cycle = 0;
     let mut strength = 0;
-    let check = [20, 60, 100, 140, 180, 220];
+
     for op in input.lines().map(|line| parse_line(line).unwrap().1) {
         cycle += 1;
+        if matches!(cycle, 20 | 60 | 100 | 140 | 180 | 220) {
+            strength += x * cycle;
+        }
         match op {
-            Op::Noop => {}
             Op::Addx(n) => {
-                if check.contains(&cycle) {
+                cycle += 1;
+                if matches!(cycle, 20 | 60 | 100 | 140 | 180 | 220) {
                     strength += x * cycle;
                 }
-                cycle += 1;
                 x += n;
             }
-        }
-        if check.contains(&cycle) {
-            strength += x * cycle;
+            Op::Noop => (),
         }
     }
 
     strength
 }
 
+#[allow(clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
 pub fn part2(input: &str) -> String {
-    // 40 wide and 6 high
     let mut x = 1;
-    let mut cycle = 1;
+    let mut cycle = 0;
+    let mut screen = [b'.'; 40 * 6];
 
-    let mut to_print = [["."; 40]; 6];
     for op in input.lines().map(|line| parse_line(line).unwrap().1) {
-        if ((cycle - 1) % 40_i64).abs_diff(x) < 2 {
-            to_print[(cycle as usize - 1) / 40][(cycle as usize - 1) % 40] = "#";
+        if (cycle as i16 % 40).abs_diff(x) < 2 {
+            screen[cycle] = b'#';
         }
         cycle += 1;
         match op {
-            Op::Noop => {}
             Op::Addx(n) => {
-                if ((cycle - 1) % 40_i64).abs_diff(x) < 2 {
-                    to_print[(cycle as usize - 1) / 40][(cycle as usize - 1) % 40] = "#";
+                if (cycle as i16 % 40).abs_diff(x) < 2 {
+                    screen[cycle] = b'#';
                 }
                 cycle += 1;
                 x += n;
             }
+            Op::Noop => (),
         }
     }
-    to_print
-        .into_iter()
-        .map(|arr| String::from_iter(arr))
+    screen
+        .chunks(40)
+        .map(|row| row.to_str().unwrap())
         .join("\n")
 }
 
 fn parse_line(input: &str) -> IResult<&str, Op> {
     alt((
-        map(preceded(tag("addx "), i64), Op::Addx),
+        map(preceded(tag("addx "), i16), Op::Addx),
         value(Op::Noop, tag("noop")),
     ))(input)
 }
+
 #[derive(Debug, Clone, Copy)]
 enum Op {
     Noop,
-    Addx(i64),
+    Addx(i16),
 }
 
 #[cfg(test)]
@@ -236,7 +238,8 @@ noop";
     #[test]
     #[ignore]
     fn part2_works() {
-        let output = "##..##..##..##..##..##..##..##..##..##..
+        let output = "\
+##..##..##..##..##..##..##..##..##..##..
 ###...###...###...###...###...###...###.
 ####....####....####....####....####....
 #####.....#####.....#####.....#####.....
