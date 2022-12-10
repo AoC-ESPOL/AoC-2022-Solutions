@@ -1,7 +1,7 @@
 const std = @import("std");
 
-const input = @embedFile("./day07.txt");
-const day = @import("./day07.zig");
+const input = @embedFile("./day08.txt");
+const day = @import("./day08.zig");
 
 pub fn main() !void {
     const partOne = try day.partOne(input);
