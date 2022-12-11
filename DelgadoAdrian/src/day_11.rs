@@ -1,144 +1,94 @@
-#![allow(unused)]
+use std::collections::VecDeque;
 
-use std::{collections::VecDeque, vec};
-
-use bstr::ByteSlice;
-use itertools::Itertools;
-use ndarray::{array, s, Array2};
 use nom::{
     branch::alt,
-    bytes::complete::{is_not, tag},
-    character::complete::{alpha1, digit1, i64, u64},
+    bytes::complete::tag,
+    character::complete::{digit1, newline, u32, u64},
     combinator::{map, value},
-    multi::{many1, separated_list1},
-    sequence::{delimited, preceded, terminated, tuple},
+    multi::separated_list1,
+    sequence::{delimited, preceded, tuple},
     IResult,
 };
-use petgraph::{
-    algo::{all_simple_paths, toposort},
-    prelude::*,
-};
 
-pub fn part1(input: &str) -> u64 {
-    let mut vec_monkeys: Vec<_> = input
+fn monkey_business<const LARGE: bool>(input: &str) -> usize {
+    let mut monkeys: Vec<_> = input
         .split("\n\n")
         .map(|line| parse_block(line).unwrap().1)
         .collect();
 
-    for _ in 0..20 {
-        for i in 0..vec_monkeys.len() {
-            while let Some(item) = vec_monkeys[i].starting_items.pop_front() {
-                let worry = match vec_monkeys[i].operation {
-                    Op::Add(n) => (item + n),
-                    Op::Mul(n) => (item * n),
-                    Op::MulOld => (item * item),
-                } / 3;
+    let common_mul: u64 = monkeys.iter().map(|m| m.divisible_test).product();
 
-                vec_monkeys[i].inspections += 1;
-                let test = worry % vec_monkeys[i].divisible_by == 0;
-                if test {
-                    let idx = vec_monkeys[i].if_true;
+    for _ in 0..(if LARGE { 10_000 } else { 20 }) {
+        for i in 0..monkeys.len() {
+            monkeys[i].inspections += monkeys[i].starting_items.len();
 
-                    vec_monkeys[idx].starting_items.push_back(worry);
-                } else {
-                    let idx = vec_monkeys[i].if_false;
-
-                    vec_monkeys[idx].starting_items.push_back(worry);
+            while let Some(item) = monkeys[i].starting_items.pop_front() {
+                let worry = match monkeys[i].operation {
+                    Op::Add(n) => item + n,
+                    Op::Mul(n) => item * n,
+                    Op::MulOld => item * item,
                 };
+
+                let worry = if LARGE { worry % common_mul } else { worry / 3 };
+
+                let throw = if worry % monkeys[i].divisible_test == 0 {
+                    monkeys[i].if_true
+                } else {
+                    monkeys[i].if_false
+                };
+
+                monkeys[throw].starting_items.push_back(worry);
             }
         }
-        // for m in &mut vec_monkeys {
-        //     println!(
-        //         "M {}: {:?}",
-        //         m.monkey_num,
-        //         m.starting_items.make_contiguous()
-        //     );
-        // }
     }
 
-    vec_monkeys.sort_by_key(|m| m.inspections);
-    vec_monkeys.reverse();
-    let [a,b,..] = &vec_monkeys[..] else { unreachable!()};
-    // println!("{a:?}");
-    // println!("{b:?}");
-    a.inspections * b.inspections
+    monkeys.sort_unstable_by_key(|m| m.inspections);
+
+    monkeys
+        .into_iter()
+        .rev()
+        .take(2)
+        .map(|m| m.inspections)
+        .product()
 }
 
-pub fn part2(input: &str) -> u64 {
-    let mut vec_monkeys: Vec<_> = input
-        .split("\n\n")
-        .map(|line| parse_block(line).unwrap().1)
-        .collect();
+pub fn part1(input: &str) -> usize {
+    monkey_business::<false>(input)
+}
 
-    let common_mul: u64 = vec_monkeys.iter().map(|m| m.divisible_by).product();
-
-    for _ in 0..10_000 {
-        for i in 0..vec_monkeys.len() {
-            while let Some(item) = vec_monkeys[i].starting_items.pop_front() {
-                let worry = match vec_monkeys[i].operation {
-                    Op::Add(n) => (item + n),
-                    Op::Mul(n) => (item * n),
-                    Op::MulOld => (item * item),
-                } % common_mul;
-
-                vec_monkeys[i].inspections += 1;
-                let test = worry % vec_monkeys[i].divisible_by == 0;
-                if test {
-                    let idx = vec_monkeys[i].if_true;
-
-                    vec_monkeys[idx].starting_items.push_back(worry);
-                } else {
-                    let idx = vec_monkeys[i].if_false;
-
-                    vec_monkeys[idx].starting_items.push_back(worry);
-                };
-            }
-        }
-        // for m in &mut vec_monkeys {
-        //     println!(
-        //         "M {}: {:?}",
-        //         m.monkey_num,
-        //         m.starting_items.make_contiguous()
-        //     );
-        // }
-    }
-
-    vec_monkeys.sort_by_key(|m| m.inspections);
-    vec_monkeys.reverse();
-    let [a,b,..] = &vec_monkeys[..] else { unreachable!()};
-    // println!("{a:?}");
-    // println!("{b:?}");
-    a.inspections * b.inspections
+pub fn part2(input: &str) -> usize {
+    monkey_business::<true>(input)
 }
 
 fn parse_block(input: &str) -> IResult<&str, Monkey> {
-    let (input, monkey_num) = delimited(tag("Monkey "), u64, tag(":\n"))(input)?;
-    let (input, starting_items) = delimited(
-        tag("  Starting items: "),
-        separated_list1(tag(", "), u64),
-        tag("\n"),
-    )(input)?;
-    let (input, operation) = delimited(
-        tag("  Operation: new = old "),
-        alt((
-            map(preceded(tag("* "), u64), Op::Mul),
-            map(preceded(tag("+ "), u64), Op::Add),
-            value(Op::MulOld, tag("* old")),
-        )),
-        tag("\n"),
-    )(input)?;
-    let (input, divisible_by) = delimited(tag("  Test: divisible by "), u64, tag("\n"))(input)?;
-    let (input, if_true) = delimited(tag("    If true: throw to monkey "), u64, tag("\n"))(input)?;
-    let (input, if_false) = preceded(tag("    If false: throw to monkey "), u64)(input)?;
+    let (input, (starting_items, operation, divisible_by, if_true, if_false)) = tuple((
+        delimited(
+            tuple((tag("Monkey "), digit1, tag(":\n  Starting items: "))),
+            separated_list1(tag(", "), u64),
+            newline,
+        ),
+        delimited(
+            tag("  Operation: new = old "),
+            alt((
+                map(preceded(tag("* "), u64), Op::Mul),
+                map(preceded(tag("+ "), u64), Op::Add),
+                value(Op::MulOld, tag("* old")),
+            )),
+            newline,
+        ),
+        delimited(tag("  Test: divisible by "), u64, newline),
+        delimited(tag("    If true: throw to monkey "), u32, newline),
+        preceded(tag("    If false: throw to monkey "), u32),
+    ))(input)?;
+
     Ok((
         input,
         Monkey {
-            monkey_num,
-            starting_items: starting_items.into(),
+            starting_items: VecDeque::from(starting_items),
             operation,
-            divisible_by,
-            if_true: if_true as _,
-            if_false: if_false as _,
+            divisible_test: divisible_by,
+            if_true: if_true as usize,
+            if_false: if_false as usize,
             inspections: 0,
         },
     ))
@@ -146,13 +96,12 @@ fn parse_block(input: &str) -> IResult<&str, Monkey> {
 
 #[derive(Debug, Clone)]
 struct Monkey {
-    monkey_num: u64,
     starting_items: VecDeque<u64>,
     operation: Op,
-    divisible_by: u64,
+    divisible_test: u64,
     if_true: usize,
     if_false: usize,
-    inspections: u64,
+    inspections: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -197,15 +146,15 @@ Monkey 3:
 
     #[test]
     fn part1_works() {
-        let output = 10605;
+        let output = 10_605;
 
         assert_eq!(part1(TEST_INPUT), output);
     }
 
-    // #[test]
-    // fn part2_works() {
-    //     let output = 45000.to_string();
+    #[test]
+    fn part2_works() {
+        let output = 2_713_310_158;
 
-    //     assert_eq!(part2(TEST_INPUT), output);
-    // }
+        assert_eq!(part2(TEST_INPUT), output);
+    }
 }
