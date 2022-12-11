@@ -1,14 +1,14 @@
 from copy import deepcopy
 data = open('day11.in').read()
 
-class Monk():
+# class Monk():
 
-    def __init__(self, items, op, mod, true_target, false_target):
-        self.items = items
-        self.op = op
-        self.mod = mod
-        self.true_target = true_target
-        self.false_target = false_target
+#     def __init__(self, items, op, mod, true_target, false_target):
+#         self.items = items
+#         self.op = op
+#         self.mod = mod
+#         self.true_target = true_target
+#         self.false_target = false_target
 # monks = []
 # items = []
 # operations = []
