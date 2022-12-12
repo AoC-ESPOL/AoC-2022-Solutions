@@ -1,21 +1,32 @@
+use bstr::ByteSlice;
 use ndarray::Array2;
 
 use petgraph::{algo::astar, prelude::*};
 
 pub fn part1(input: &str) -> i32 {
-    let cols = input.find("\n").unwrap();
+    let cols = input.find('\n').unwrap();
     let rows = input.trim_end().lines().count();
+    let input = Vec::from(input.replace('\n', ""));
+    let start = {
+        let idx = input.find("S").unwrap();
+        [idx / cols, idx % cols]
+    };
+    let end = {
+        let idx = input.find("E").unwrap();
+        [idx / cols, idx % cols]
+    };
+
     let arr = Array2::<i32>::from_shape_vec(
         (rows, cols),
         input
-            .replace("\n", "")
-            .as_bytes()
             .into_iter()
-            .map(|&ch| match ch {
-                b'S' => b'a',
-                b'E' => b'z',
-                _ => ch,
-            } as i32)
+            .map(|ch| {
+                i32::from(match ch {
+                    b'S' => b'a',
+                    b'E' => b'z',
+                    _ => ch,
+                })
+            })
             .collect(),
     )
     .unwrap();
@@ -40,25 +51,31 @@ pub fn part1(input: &str) -> i32 {
         }
     }
 
-    astar(&gr, [20, 0], |f| f == [20, 40], |e| *e.weight(), |_| 0_i32)
+    astar(&gr, start, |f| f == end, |e| *e.weight(), |_| 0)
         .unwrap()
         .0
 }
 
 pub fn part2(input: &str) -> i32 {
-    let cols = input.find("\n").unwrap();
+    let cols = input.find('\n').unwrap();
     let rows = input.trim_end().lines().count();
+    let input = Vec::from(input.replace('\n', ""));
+    let end = {
+        let idx = input.find("E").unwrap();
+        [idx / cols, idx % cols]
+    };
+
     let arr = Array2::<i32>::from_shape_vec(
         (rows, cols),
         input
-            .replace("\n", "")
-            .as_bytes()
             .into_iter()
-            .map(|&ch| match ch {
-                b'S' => b'a',
-                b'E' => b'z',
-                _ => ch,
-            } as i32)
+            .map(|ch| {
+                i32::from(match ch {
+                    b'S' => b'a',
+                    b'E' => b'z',
+                    _ => ch,
+                })
+            })
             .collect(),
     )
     .unwrap();
@@ -87,18 +104,11 @@ pub fn part2(input: &str) -> i32 {
 
     for (row, line) in arr.rows().into_iter().enumerate() {
         for (col, ch) in line.into_iter().enumerate() {
-            if *ch == (b'a' as i32) {
-                fewest_steps = fewest_steps.min(
-                    astar(
-                        &gr,
-                        [row, col],
-                        |f| f == [20, 40],
-                        |e| *e.weight(),
-                        |_| 0_i32,
-                    )
-                    .unwrap_or((370, vec![]))
-                    .0,
-                );
+            if *ch == i32::from(b'a') {
+                let Some((steps, _)) =
+                    astar(&gr, [row, col], |f| f == end, |e| *e.weight(), |_| 0) else { continue; };
+
+                fewest_steps = fewest_steps.min(steps);
             }
         }
     }
@@ -106,24 +116,28 @@ pub fn part2(input: &str) -> i32 {
     fewest_steps
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::{part1, part2};
+#[cfg(test)]
+mod tests {
+    use super::{part1, part2};
 
-//     const TEST_INPUT: &str = "\
-// ";
+    const TEST_INPUT: &str = "\
+Sabqponm
+abcryxxl
+accszExk
+acctuvwj
+abdefghi";
 
-//     #[test]
-//     fn part1_works() {
-//         let output = 24000;
+    #[test]
+    fn part1_works() {
+        let output = 31;
 
-//         assert_eq!(part1(TEST_INPUT), output);
-//     }
+        assert_eq!(part1(TEST_INPUT), output);
+    }
 
-//     #[test]
-//     fn part2_works() {
-//         let output = 45000;
+    #[test]
+    fn part2_works() {
+        let output = 29;
 
-//         assert_eq!(part2(TEST_INPUT), output);
-//     }
-// }
+        assert_eq!(part2(TEST_INPUT), output);
+    }
+}
