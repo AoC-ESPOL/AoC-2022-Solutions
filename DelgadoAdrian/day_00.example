@@ -6,8 +6,9 @@ use ndarray::{array, s, Array2};
 use nom::{
     branch::alt,
     bytes::complete::{is_not, tag},
-    character::complete::{alpha1, digit1, i64, u32},
-    combinator::value,
+    character::complete::{alpha1, digit1, i64, newline, u32, u64},
+    combinator::{map, value},
+    multi::separated_list1,
     sequence::{delimited, preceded, terminated, tuple},
     IResult,
 };
@@ -17,11 +18,9 @@ use petgraph::{
 };
 
 pub fn part1(input: &str) -> String {
-    // input
-    //     .lines()
-    //     .map(|line| parse_line(line).unwrap().1)
-    //     .map(|v| v)
-    //     .count();
+    // for item in input.lines().map(|line| parse_line(line).unwrap().1) {
+    //     ();
+    // }
     // let input = input.trim_end();
     todo!()
 }

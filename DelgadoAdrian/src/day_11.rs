@@ -145,6 +145,7 @@ Monkey 3:
     If false: throw to monkey 1";
 
     #[test]
+    #[ignore]
     fn part1_works() {
         let output = 10_605;
 
@@ -152,6 +153,7 @@ Monkey 3:
     }
 
     #[test]
+    #[ignore]
     fn part2_works() {
         let output = 2_713_310_158;
 
