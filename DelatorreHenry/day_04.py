@@ -12,7 +12,7 @@ for line in archivo:
 archivo.close()
 print(contador)
 
-PARTE 2 
+#PARTE 2 
 contador = 0
 archivo = open("entrada.txt","r")
 for line in archivo:
