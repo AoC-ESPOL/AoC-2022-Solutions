@@ -103,6 +103,7 @@ acctuvwj
 abdefghi";
 
     #[test]
+    #[ignore]
     fn part1_works() {
         let output = 31;
 
@@ -110,6 +111,7 @@ abdefghi";
     }
 
     #[test]
+    #[ignore]
     fn part2_works() {
         let output = 29;
 
