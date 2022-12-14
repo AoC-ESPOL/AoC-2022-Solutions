@@ -17,10 +17,8 @@ def compare(left ,right ):
         idx = 0
         while idx<len(left) and idx<len(right):
             r = compare(left[idx], right[idx])
-            if r=="good":
-                return "good"
-            if r=="bad":
-                return "bad"
+            if r in ("good","bad"):
+                return r
             idx += 1
         if idx==len(left) and idx<len(right):
             return "good"
@@ -30,10 +28,9 @@ def compare(left ,right ):
             return "eq"
     elif isinstance(left, int) and not isinstance(right, int):
         left = [left]
-        return compare(left, right)
     else:
         right = [right]
-        return compare(left, right)
+    return compare(left, right)
 
 s1 = 0
 for i,group in enumerate(lines):
@@ -45,7 +42,6 @@ print(s1)
 
 def comp(left,right):
     r = comp(left, right)
-    print
     if r == "good":
         return -1
     elif r =="bad":
