@@ -1,56 +1,41 @@
-#![allow(unused)]
-
 use std::collections::HashSet;
 
-use bstr::ByteSlice;
 use itertools::Itertools;
-use ndarray::{array, s, Array2};
 use nom::{
-    branch::alt,
-    bytes::complete::{is_not, tag},
-    character::complete::{alpha1, digit1, i64, newline, u32, u64},
-    combinator::{map, value},
-    multi::separated_list0,
-    sequence::{delimited, preceded, separated_pair, terminated, tuple},
-    IResult,
-};
-use petgraph::{
-    algo::{all_simple_paths, toposort},
-    prelude::*,
+    bytes::complete::tag, character::complete::u16, multi::separated_list0,
+    sequence::separated_pair, IResult,
 };
 
-pub fn part1(input: &str) -> usize {
-    // 460-537, 15-161
-
-    let mut cave = HashSet::new();
-    for scan in input.lines().map(|line| parse_line(line).unwrap().1) {
-        for line in scan.windows(2) {
-            let [(x1, y1), (x2, y2)] = *line else { unreachable!() };
-            if x1 == x2 {
-                for y in y1.min(y2)..=y2.max(y1) {
-                    cave.insert((x1, y));
-                }
-            } else {
-                for x in x1.min(x2)..=x2.max(x1) {
-                    cave.insert((x, y1));
-                }
-            }
-        }
-    }
+fn solve<const PART_2: bool>(input: &str) -> usize {
+    let mut cave: HashSet<_> = input
+        .lines()
+        .map(|line| parse_line(line).unwrap().1)
+        .flat_map(|scan| {
+            scan.into_iter()
+                .tuple_windows()
+                .flat_map(|((x1, y1), (x2, y2))| {
+                    (x1.min(x2)..=x2.max(x1)).cartesian_product(y1.min(y2)..=y2.max(y1))
+                })
+        })
+        .collect();
 
     let amount_rocks = cave.len();
 
     let max_y = cave.iter().map(|(_, y)| *y).max().unwrap();
 
-    loop {
-        // if cave.contains(&(500, 0)) {
-        //     return cave.len() - amount_rocks;
-        // }
+    'outer: loop {
+        if PART_2 && cave.contains(&(500, 0)) {
+            break;
+        }
         let mut curr_x = 500;
         let mut curr_y = 0;
-        loop {
+
+        let new_position = loop {
             if curr_y > max_y {
-                return cave.len() - amount_rocks;
+                if PART_2 {
+                    break (curr_x, curr_y);
+                }
+                break 'outer;
             }
 
             if !cave.contains(&(curr_x, curr_y + 1)) {
@@ -62,66 +47,26 @@ pub fn part1(input: &str) -> usize {
                 curr_y += 1;
                 curr_x += 1;
             } else {
-                cave.insert((curr_x, curr_y));
-                break;
+                break (curr_x, curr_y);
             }
-        }
+        };
+
+        cave.insert(new_position);
     }
+
+    cave.len() - amount_rocks
+}
+
+pub fn part1(input: &str) -> usize {
+    solve::<false>(input)
 }
 
 pub fn part2(input: &str) -> usize {
-    // 460-537, 15-161
-
-    let mut cave = HashSet::new();
-    for scan in input.lines().map(|line| parse_line(line).unwrap().1) {
-        for line in scan.windows(2) {
-            let [(x1, y1), (x2, y2)] = *line else { unreachable!() };
-            if x1 == x2 {
-                for y in y1.min(y2)..=y2.max(y1) {
-                    cave.insert((x1, y));
-                }
-            } else {
-                for x in x1.min(x2)..=x2.max(x1) {
-                    cave.insert((x, y1));
-                }
-            }
-        }
-    }
-
-    let amount_rocks = cave.len();
-
-    let max_y = cave.iter().map(|(_, y)| *y).max().unwrap();
-
-    loop {
-        if cave.contains(&(500, 0)) {
-            return cave.len() - amount_rocks;
-        }
-        let mut curr_x = 500;
-        let mut curr_y = 0;
-        loop {
-            if curr_y > max_y {
-                cave.insert((curr_x, curr_y));
-                break;
-            }
-
-            if !cave.contains(&(curr_x, curr_y + 1)) {
-                curr_y += 1;
-            } else if !cave.contains(&(curr_x - 1, curr_y + 1)) {
-                curr_y += 1;
-                curr_x -= 1;
-            } else if !cave.contains(&(curr_x + 1, curr_y + 1)) {
-                curr_y += 1;
-                curr_x += 1;
-            } else {
-                cave.insert((curr_x, curr_y));
-                break;
-            }
-        }
-    }
+    solve::<true>(input)
 }
 
-fn parse_line(input: &str) -> IResult<&str, Vec<(u32, u32)>> {
-    separated_list0(tag(" -> "), separated_pair(u32, tag(","), u32))(input)
+fn parse_line(input: &str) -> IResult<&str, Vec<(u16, u16)>> {
+    separated_list0(tag(" -> "), separated_pair(u16, tag(","), u16))(input)
 }
 
 #[cfg(test)]
@@ -133,6 +78,7 @@ mod tests {
 503,4 -> 502,4 -> 502,9 -> 494,9";
 
     #[test]
+    #[ignore]
     fn part1_works() {
         let output = 24;
 
@@ -140,6 +86,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn part2_works() {
         let output = 93;
 
