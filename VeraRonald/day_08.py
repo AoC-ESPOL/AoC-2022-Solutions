@@ -65,6 +65,74 @@ def count_visible_trees(grid):
                 count += 1
     return count
 
+
+def get_scenic_score(x, y, grid):
+    scenic_score = 1
+
+    element = grid[x, y]
+
+    fila = grid[x, :]
+
+    left = fila[:y]
+
+    to_the_left = 0
+    for i in left[::-1]:
+        to_the_left += 1
+        if i >= element:
+            break
+    if to_the_left:
+        scenic_score *= to_the_left
+
+
+    rigth = fila[y + 1:]
+    to_the_rigth = 0
+    for i in rigth:
+        to_the_rigth += 1
+        if i >= element:
+            break
+
+    if to_the_rigth:
+        scenic_score *= to_the_rigth
+
+
+    columna = grid[:, y].transpose()
+
+    top = columna[:x]
+    to_the_top = 0
+    for i in top[::-1]:
+        to_the_top += 1
+        if i >= element:
+            break
+
+    if to_the_top:
+        scenic_score *= to_the_top
+
+
+    bottom = columna[x + 1:]
+    to_the_bottom= 0
+    for i in bottom:
+        to_the_bottom += 1
+        if i >= element:
+            break
+
+    if to_the_bottom:
+        scenic_score *= to_the_bottom
+
+    return scenic_score
+
+def get_best_tree(grid):
+    best = 0
+    grid = np.array(grid)
+
+    for arrow in range(len(grid[:, 0])):
+        for column in range(len(grid[0, :])):
+            score = get_scenic_score(arrow, column, grid)
+            if score > best:
+                best = score
+    return best
+
 # PART 1
 print(count_visible_trees(get_data("input.txt")))
 
+# PART 2
+print(get_best_tree(get_data("input.txt")))
