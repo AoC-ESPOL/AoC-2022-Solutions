@@ -1,106 +1,118 @@
-#![allow(unused)]
-
-use bstr::ByteSlice;
-use itertools::Itertools;
-use ndarray::{array, s, Array2};
 use nom::{
-    branch::alt,
-    bytes::complete::{is_not, tag},
-    character::complete::{alpha1, digit1, i64, newline, u32, u64},
-    combinator::{map, value},
-    multi::separated_list0,
-    sequence::{delimited, preceded, terminated, tuple},
+    bytes::complete::tag,
+    character::complete::i64,
+    sequence::{preceded, separated_pair},
     IResult,
 };
-use petgraph::{
-    algo::{all_simple_paths, toposort},
-    prelude::*,
-};
 
-const STUFF: [[(i64, i64); 2]; 26] = [
-    [(3999724, 2000469), (4281123, 2282046)],
-    [(3995530, 8733), (3321979, 692911)],
-    [(3016889, 2550239), (2408038, 2645605)],
-    [(3443945, 3604888), (3610223, 3768674)],
-    [(168575, 491461), (1053731, 142061)],
-    [(2820722, 3865596), (3191440, 3801895)],
-    [(2329102, 2456329), (2408038, 2645605)],
-    [(3889469, 3781572), (3610223, 3768674)],
-    [(3256726, 3882107), (3191440, 3801895)],
-    [(3729564, 3214899), (3610223, 3768674)],
-    [(206718, 2732608), (-152842, 3117903)],
-    [(2178192, 2132103), (2175035, 2000000)],
-    [(1884402, 214904), (1053731, 142061)],
-    [(3060435, 980430), (2175035, 2000000)], // here
-    [(3998355, 3965954), (3610223, 3768674)],
-    [(3704399, 3973731), (3610223, 3768674)],
-    [(1421672, 3446889), (2408038, 2645605)],
-    [(3415633, 3916020), (3191440, 3801895)],
-    [(2408019, 2263990), (2408038, 2645605)],
-    [(3735247, 2533767), (4281123, 2282046)],
-    [(1756494, 1928662), (2175035, 2000000)],
-    [(780161, 1907142), (2175035, 2000000)],
-    [(3036853, 3294727), (3191440, 3801895)],
-    [(53246, 3908582), (-152842, 3117903)],
-    [(2110517, 2243287), (2175035, 2000000)],
-    [(3149491, 3998374), (3191440, 3801895)],
-];
+#[cfg(test)]
+const Y: i64 = 10;
+#[cfg(not(test))]
+const Y: i64 = 2_000_000;
 
-pub fn part1(input: &str) -> u64 {
-    let y_coord = 2_000_000;
-    let distances =
-        STUFF.map(|[sensor, closest_beacon]| (sensor, distance(sensor, closest_beacon)));
+#[cfg(test)]
+const LIMIT_COORD: i64 = 20;
+#[cfg(not(test))]
+const LIMIT_COORD: i64 = 4_000_000;
 
-    let max_distance = distances.iter().map(|(_, d)| *d).max().unwrap();
+pub fn part1(input: &str) -> usize {
+    let sensor_data: Vec<_> = input
+        .lines()
+        .map(|line| parse_line(line).unwrap().1)
+        .collect();
 
-    let x_values = (-1_000_000)..(2175035 + 3_000_000);
-    let mut asdf = 0;
-    for x in x_values {
-        if distances
-            .iter()
-            .any(|(sensor, d)| distance((x, y_coord), *sensor) <= *d)
-        {
-            asdf += 1;
-        }
+    let mut min_x = i64::MAX;
+    let mut max_x = i64::MIN;
+
+    for (min_range, max_range) in sensor_data
+        .iter()
+        .filter_map(|&(sensor, closest_beacon)| min_max_pair(sensor, closest_beacon))
+    {
+        min_x = min_x.min(min_range);
+        max_x = max_x.max(max_range);
     }
 
-    asdf - 1
+    let beacons_x: Vec<_> = sensor_data
+        .iter()
+        .filter(|(_, (_, y))| *y == Y)
+        .map(|(_, (x, _))| *x)
+        .collect();
+
+    (min_x..=max_x)
+        .filter(|&x| {
+            sensor_data
+                .iter()
+                .map(|&(sensor, closest_beacon)| (sensor, manhattan(sensor, closest_beacon)))
+                .any(|(sensor, d)| manhattan((x, Y), sensor) <= d)
+                && !beacons_x.contains(&x)
+        })
+        .count()
 }
 
-fn distance((x1, y1): (i64, i64), (x2, y2): (i64, i64)) -> u64 {
-    x1.abs_diff(x2) + y1.abs_diff(y2)
-}
+pub fn part2(input: &str) -> i64 {
+    let sensor_data: Vec<_> = input
+        .lines()
+        .map(|line| parse_line(line).unwrap().1)
+        .collect();
 
-pub fn part2(_input: &str) -> i64 {
-    let distances =
-        STUFF.map(|[sensor, closest_beacon]| (sensor, distance(sensor, closest_beacon)));
+    let distances = sensor_data
+        .iter()
+        .map(|&(sensor, closest_beacon)| (sensor, manhattan(sensor, closest_beacon)));
 
-    let max_distance = distances.iter().map(|(_, d)| *d).max().unwrap();
-
-    for (sensor, d) in distances {
-        for (x, y) in border(sensor, d as i64) {
-            if !(0..=4000000).contains(&x) || !(0..=4000000).contains(&y) {
+    for (sensor, d) in distances.clone() {
+        for (x, y) in border(sensor, d.try_into().unwrap()) {
+            if !(0..=LIMIT_COORD).contains(&x) || !(0..=LIMIT_COORD).contains(&y) {
                 continue;
             }
             if distances
-                .iter()
-                .all(|(sensor, d)| distance((x, y), *sensor) > *d)
+                .clone()
+                .all(|(sensor, d)| manhattan((x, y), sensor) > d)
             {
-                return x * 4000000 + y;
+                return x * 4_000_000 + y;
             }
         }
     }
 
-    0
+    unreachable!()
+}
+
+fn min_max_pair((x1, y1): (i64, i64), closest_beacon: (i64, i64)) -> Option<(i64, i64)> {
+    let d = manhattan((x1, y1), closest_beacon);
+    let distance_to_y = y1.abs_diff(Y);
+    let dx: i64 = (d >= distance_to_y)
+        .then_some(d.wrapping_sub(distance_to_y))?
+        .try_into()
+        .unwrap();
+
+    Some((x1 - dx, x1 + dx))
+}
+
+fn manhattan((x1, y1): (i64, i64), (x2, y2): (i64, i64)) -> u64 {
+    x1.abs_diff(x2) + y1.abs_diff(y2)
 }
 
 fn border((x1, y1): (i64, i64), d: i64) -> impl Iterator<Item = (i64, i64)> {
-    let signs = [(1, 1), (-1, 1), (-1, -1), (1, -1)];
-
     (0..d + 2)
         .map(move |dx| (dx, (d + 1) - dx))
-        .flat_map(move |deltas| signs.into_iter().map(move |signs| (deltas, signs)))
+        .flat_map(|deltas| {
+            [(1, 1), (-1, 1), (-1, -1), (1, -1)]
+                .into_iter()
+                .map(move |signs| (deltas, signs))
+        })
         .map(move |((dx, dy), (sgnx, sgny))| (x1 + (dx * sgnx), y1 + (dy * sgny)))
+}
+
+type SensorData = ((i64, i64), (i64, i64));
+
+fn parse_line(input: &str) -> IResult<&str, SensorData> {
+    preceded(
+        tag("Sensor at x="),
+        separated_pair(pair_parser, tag(": closest beacon is at x="), pair_parser),
+    )(input)
+}
+
+fn pair_parser(input: &str) -> IResult<&str, (i64, i64)> {
+    separated_pair(i64, tag(", y="), i64)(input)
 }
 
 #[cfg(test)]
@@ -108,19 +120,34 @@ mod tests {
     use super::{part1, part2};
 
     const TEST_INPUT: &str = "\
-";
+Sensor at x=2, y=18: closest beacon is at x=-2, y=15
+Sensor at x=9, y=16: closest beacon is at x=10, y=16
+Sensor at x=13, y=2: closest beacon is at x=15, y=3
+Sensor at x=12, y=14: closest beacon is at x=10, y=16
+Sensor at x=10, y=20: closest beacon is at x=10, y=16
+Sensor at x=14, y=17: closest beacon is at x=10, y=16
+Sensor at x=8, y=7: closest beacon is at x=2, y=10
+Sensor at x=2, y=0: closest beacon is at x=2, y=10
+Sensor at x=0, y=11: closest beacon is at x=2, y=10
+Sensor at x=20, y=14: closest beacon is at x=25, y=17
+Sensor at x=17, y=20: closest beacon is at x=21, y=22
+Sensor at x=16, y=7: closest beacon is at x=15, y=3
+Sensor at x=14, y=3: closest beacon is at x=15, y=3
+Sensor at x=20, y=1: closest beacon is at x=15, y=3";
 
     #[test]
+    #[ignore]
     fn part1_works() {
-        let output = 24000;
+        let output = 26;
 
         assert_eq!(part1(TEST_INPUT), output);
     }
 
-    // #[test]
-    // fn part2_works() {
-    //     let output = 45000;
+    #[test]
+    #[ignore]
+    fn part2_works() {
+        let output = 56000011;
 
-    //     assert_eq!(part2(TEST_INPUT), output);
-    // }
+        assert_eq!(part2(TEST_INPUT), output);
+    }
 }
