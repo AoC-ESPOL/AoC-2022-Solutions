@@ -35,7 +35,6 @@ def comparator(x,y):
         return 1
     else:
         return -1
-    return None
 
 for i in range(len(l1)):
     if comparator(l1[i][0], l1[i][1]) == 1:
