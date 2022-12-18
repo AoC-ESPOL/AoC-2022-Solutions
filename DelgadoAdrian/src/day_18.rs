@@ -1,23 +1,7 @@
-#![allow(unused)]
-
 use std::collections::{HashMap, HashSet};
 
-use bstr::ByteSlice;
-use itertools::{iproduct, Itertools};
-use ndarray::{array, s, Array2};
-use nom::{
-    branch::alt,
-    bytes::complete::{is_not, tag},
-    character::complete::{alpha1, digit1, i64, newline, u64},
-    combinator::{map, value},
-    multi::separated_list0,
-    sequence::{delimited, preceded, terminated, tuple},
-    IResult,
-};
-use petgraph::{
-    algo::{all_simple_paths, toposort},
-    prelude::*,
-};
+use itertools::iproduct;
+use nom::{bytes::complete::tag, character::complete::i64, sequence::tuple, IResult};
 
 type Cube = (i64, i64, i64);
 
