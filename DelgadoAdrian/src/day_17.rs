@@ -300,20 +300,18 @@ pub fn part2(input: &str) -> u64 {
             } else {
                 // optimization
                 let highest_y_coord = chamber.iter().map(|(_, y)| *y).max().unwrap();
-                let chamber_hash = (
-                    stoped_rocks % 5,
-                    stream_idx,
-                    chamber
+                let chamber_hash = (stoped_rocks % 5, stream_idx, {
+                    let mut ret = chamber
                         .iter()
                         .filter_map(|&(x, y)| {
                             (y >= highest_y_coord.saturating_sub(32))
                                 .then_some((x, highest_y_coord - y))
                         })
-                        .unique()
-                        .sorted()
-                        .collect_vec(),
-                );
-                if stoped_rocks >= 2022 {
+                        .collect_vec();
+                    ret.sort_unstable();
+                    ret
+                });
+                if stoped_rocks >= 32 {
                     if let Some((prev_stoped_rocks, prev_highest_y_coord)) =
                         previous_hashes.get(&chamber_hash)
                     {
