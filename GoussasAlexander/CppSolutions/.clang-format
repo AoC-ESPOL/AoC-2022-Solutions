@@ -1,7 +1,0 @@
-BasedOnStyle: GNU
-SpaceBeforeParens: ControlStatements
-AlwaysBreakTemplateDeclarations: Yes
-PointerAlignment: Left
-ColumnLimit: 100
-AllowShortCaseLabelsOnASingleLine: true
-AllowShortIfStatementsOnASingleLine: true
