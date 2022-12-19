@@ -71,6 +71,21 @@ pub fn part1(input: &str) -> i64 {
             let add_obsidian_robot = ore >= bluep.obsidian_ore && clay >= bluep.obsidian_clay;
             let add_geode_robot = ore >= bluep.geode_ore && obsidian >= bluep.geode_obsidian;
 
+            if add_geode_robot {
+                queue.push_back((
+                    ore - bluep.geode_ore + ore_robot,
+                    clay + clay_robot,
+                    obsidian - bluep.geode_obsidian + obsidian_robot,
+                    geode + geode_robot,
+                    ore_robot,
+                    clay_robot,
+                    obsidian_robot,
+                    geode_robot + 1,
+                    minute - 1,
+                ));
+                continue;
+            }
+
             queue.push_back((
                 ore + ore_robot,
                 clay + clay_robot,
@@ -119,19 +134,6 @@ pub fn part1(input: &str) -> i64 {
                     clay_robot,
                     obsidian_robot + 1,
                     geode_robot,
-                    minute - 1,
-                ));
-            }
-            if add_geode_robot {
-                queue.push_back((
-                    ore - bluep.geode_ore + ore_robot,
-                    clay + clay_robot,
-                    obsidian - bluep.geode_obsidian + obsidian_robot,
-                    geode + geode_robot,
-                    ore_robot,
-                    clay_robot,
-                    obsidian_robot,
-                    geode_robot + 1,
                     minute - 1,
                 ));
             }
@@ -210,6 +212,21 @@ pub fn part2(input: &str) -> i64 {
             let add_obsidian_robot = ore >= bluep.obsidian_ore && clay >= bluep.obsidian_clay;
             let add_geode_robot = ore >= bluep.geode_ore && obsidian >= bluep.geode_obsidian;
 
+            if add_geode_robot {
+                queue.push_back((
+                    ore - bluep.geode_ore + ore_robot,
+                    clay + clay_robot,
+                    obsidian - bluep.geode_obsidian + obsidian_robot,
+                    geode + geode_robot,
+                    ore_robot,
+                    clay_robot,
+                    obsidian_robot,
+                    geode_robot + 1,
+                    minute - 1,
+                ));
+                continue;
+            }
+
             queue.push_back((
                 ore + ore_robot,
                 clay + clay_robot,
@@ -258,19 +275,6 @@ pub fn part2(input: &str) -> i64 {
                     clay_robot,
                     obsidian_robot + 1,
                     geode_robot,
-                    minute - 1,
-                ));
-            }
-            if add_geode_robot {
-                queue.push_back((
-                    ore - bluep.geode_ore + ore_robot,
-                    clay + clay_robot,
-                    obsidian - bluep.geode_obsidian + obsidian_robot,
-                    geode + geode_robot,
-                    ore_robot,
-                    clay_robot,
-                    obsidian_robot,
-                    geode_robot + 1,
                     minute - 1,
                 ));
             }
