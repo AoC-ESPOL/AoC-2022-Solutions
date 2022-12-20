@@ -42,8 +42,7 @@ pub fn part2(input: &str) -> u32 {
     let free_space = 70_000_000 - dir_sizes[["/"].as_ref()];
 
     dir_sizes
-        .into_iter()
-        .map(|(_, v)| v)
+        .into_values()
         .filter(|v| free_space + v >= 30_000_000)
         .min()
         .unwrap()
