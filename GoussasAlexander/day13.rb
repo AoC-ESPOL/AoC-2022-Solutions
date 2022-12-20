@@ -1,36 +1,11 @@
-class Parser
-  def initialize(input)
-    @input = input
-    @pos = 0
-  end
+require_relative 'parser'
 
-  def advance
-    @pos += 1
-    @input[@pos - 1]
-  end
-
-  def peek
-    @input[@pos]
-  end
-
-  def consume(expected)
-    actual = advance
-    return unless expected != actual
-
-    throw "Expected #{expected} but got #{actual}"
-  end
-
+class Parser < BaseParser
   def parse
     case peek
     when '[' then parse_ary
     else parse_number
     end
-  end
-
-  def parse_number
-    n = ''
-    n << advance while peek =~ /\d/
-    n.to_i
   end
 
   def parse_ary
@@ -44,6 +19,10 @@ class Parser
     consume(']')
     ary
   end
+end
+
+def parse_line(line)
+  Parser.new(line).parse
 end
 
 def pair_order(fst, snd)
@@ -71,7 +50,7 @@ def part_one(input)
   input
     .split(/\n\n/)
     .each
-    .map { |pair| pair.split(/\n/).map { |line| Parser.new(line).parse } }
+    .map { |pair| pair.split(/\n/).map { |line| parse_line(line) } }
     .each_with_index
     .map { |pair, i| pair_order(pair[0], pair[1]).negative? ? i + 1 : 0 }
     .sum
@@ -81,7 +60,7 @@ def part_two(input)
   input
     .gsub(/\n\n/, "\n")
     .lines
-    .map { |line| Parser.new(line).parse }
+    .map { |line| parse_line(line) }
     .concat([[[2]], [[6]]])
     .sort { |x, y| pair_order(x, y) }
     .each_with_index
