@@ -278,6 +278,7 @@ Valve II has flow rate=0; tunnels lead to valves AA, JJ
 Valve JJ has flow rate=21; tunnel leads to valve II";
 
     #[test]
+    #[ignore]
     fn part1_works() {
         let output = 1651;
 
@@ -285,6 +286,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II";
     }
 
     #[test]
+    #[ignore]
     fn part2_works() {
         let output = 1707;
 
