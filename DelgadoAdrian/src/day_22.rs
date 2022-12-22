@@ -1,21 +1,13 @@
-#![allow(unused)]
-
-use bstr::ByteSlice;
-use itertools::Itertools;
-use ndarray::{array, s, Array2};
+use ndarray::{s, Array2};
 use nom::{
     branch::alt,
-    bytes::complete::{is_not, tag},
-    character::complete::{alpha1, anychar, digit1, i32, newline, u32, u64},
+    bytes::complete::tag,
+    character::complete::i32,
     combinator::{map, value},
-    multi::{many1, separated_list0},
-    sequence::{delimited, preceded, terminated, tuple},
+    multi::many1,
     IResult,
 };
-use petgraph::{
-    algo::{all_simple_paths, toposort},
-    prelude::*,
-};
+
 // 200x150
 
 const D: [(i32, i32); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
