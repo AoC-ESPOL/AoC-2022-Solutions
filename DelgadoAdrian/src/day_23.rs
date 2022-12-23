@@ -23,23 +23,22 @@ pub fn part1(input: &str) -> usize {
 
     for round in 0..10 {
         let mut considered = HashMap::new();
-        for &[x, y] in ground.iter() {
+        for &[x, y] in &ground {
             // check if elf is alone
-            if ADJ.into_iter().all(|(dx, dy)| {
-                let (x_1, y_1) = (x + dx, y + dy);
-                !ground.contains(&[x_1, y_1])
-            }) {
+            if ADJ
+                .into_iter()
+                .all(|(dx, dy)| !ground.contains(&[x + dx, y + dy]))
+            {
                 continue;
             };
             for deltas in DIRECTIONS.into_iter().cycle().skip(round % 4).take(4) {
-                if deltas.into_iter().all(|(dx, dy)| {
-                    let (x_1, y_1) = (x + dx, y + dy);
-                    !ground.contains(&[x_1, y_1])
-                }) {
+                if deltas
+                    .into_iter()
+                    .all(|(dx, dy)| !ground.contains(&[x + dx, y + dy]))
+                {
                     let (dx, dy) = deltas[1];
 
-                    let new_cell = [x + dx, y + dy];
-                    match considered.entry(new_cell) {
+                    match considered.entry([x + dx, y + dy]) {
                         Entry::Occupied(mut entry) => {
                             entry.insert(None);
                         }
@@ -66,18 +65,14 @@ pub fn part1(input: &str) -> usize {
     let mut min_y = i32::MAX;
     let mut max_y = i32::MIN;
 
-    for &[x, y] in ground.iter() {
+    for &[x, y] in &ground {
         min_x = min_x.min(x);
         max_x = max_x.max(x);
         min_y = min_y.min(y);
         max_y = max_y.max(y);
     }
 
-    ((max_x - min_x + 1) * (max_y - min_y + 1)) as usize
-        - ground
-            .into_iter()
-            .filter(|&[x, y]| ((min_x..=max_x).contains(&x) && (y..=max_y).contains(&y)))
-            .count()
+    ((max_x - min_x + 1) * (max_y - min_y + 1)) as usize - ground.len()
 }
 
 pub fn part2(input: &str) -> usize {
@@ -85,23 +80,22 @@ pub fn part2(input: &str) -> usize {
 
     for round in 0.. {
         let mut considered = HashMap::new();
-        for &[x, y] in ground.iter() {
+        for &[x, y] in &ground {
             // check if elf is alone
-            if ADJ.into_iter().all(|(dx, dy)| {
-                let (x_1, y_1) = (x + dx, y + dy);
-                !ground.contains(&[x_1, y_1])
-            }) {
+            if ADJ
+                .into_iter()
+                .all(|(dx, dy)| !ground.contains(&[x + dx, y + dy]))
+            {
                 continue;
             };
             for deltas in DIRECTIONS.into_iter().cycle().skip(round % 4).take(4) {
-                if deltas.into_iter().all(|(dx, dy)| {
-                    let (x_1, y_1) = (x + dx, y + dy);
-                    !ground.contains(&[x_1, y_1])
-                }) {
+                if deltas
+                    .into_iter()
+                    .all(|(dx, dy)| !ground.contains(&[x + dx, y + dy]))
+                {
                     let (dx, dy) = deltas[1];
 
-                    let new_cell = [x + dx, y + dy];
-                    match considered.entry(new_cell) {
+                    match considered.entry([x + dx, y + dy]) {
                         Entry::Occupied(mut entry) => {
                             entry.insert(None);
                         }
