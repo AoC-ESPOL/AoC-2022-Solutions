@@ -65,13 +65,13 @@ def cube_movement(actual_pos, actual_dr):
     if x[0] in range(len(obstacle_board)) and x[1] in range(len(obstacle_board[0])) and obstacle_board[x[0]][x[1]] != " ":
         return (x, actual_dr)
     elif actual_dr == directions[0]:
-        directions_index0(x)
+        return directions_index0(x)
     elif actual_dr == directions[1]:
-        directions_index1(x)
+        return directions_index1(x)
     elif actual_dr == directions[2]:
-        directions_index2(x)
+        return directions_index2(x)
     elif actual_dr == directions[-1]:
-        directions_index3(x)
+        return directions_index3(x)
 
 for movement in movements.split(" "):
     if movement == "R":
