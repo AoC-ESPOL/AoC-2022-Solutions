@@ -1,4 +1,4 @@
-use std::collections::{hash_map::Entry, HashMap};
+use std::collections::{hash_map::Entry, HashMap, HashSet};
 
 const DIRECTIONS: [[(i32, i32); 3]; 4] = [
     [(-1, -1), (-1, 0), (-1, 1)], // N
@@ -18,23 +18,23 @@ const ADJ: [(i32, i32); 8] = [
     (-1, 1),
 ];
 
-pub fn part1(input: &str) -> i32 {
-    let mut ground = parse_ground(input); // 1 -> elf, 0 -> empty
+pub fn part1(input: &str) -> usize {
+    let mut ground = parse_ground(input);
 
     for round in 0..10 {
         let mut considered = HashMap::new();
-        for (&[x, y], _) in ground.iter().filter(|&(_, chr)| *chr == 1) {
+        for &[x, y] in ground.iter() {
             // check if elf is alone
             if ADJ.into_iter().all(|(dx, dy)| {
                 let (x_1, y_1) = (x + dx, y + dy);
-                ground.get(&[x_1, y_1]) != Some(&1)
+                !ground.contains(&[x_1, y_1])
             }) {
                 continue;
             };
             for deltas in DIRECTIONS.into_iter().cycle().skip(round % 4).take(4) {
                 if deltas.into_iter().all(|(dx, dy)| {
                     let (x_1, y_1) = (x + dx, y + dy);
-                    ground.get(&[x_1, y_1]) != Some(&1)
+                    !ground.contains(&[x_1, y_1])
                 }) {
                     let (dx, dy) = deltas[1];
 
@@ -51,12 +51,12 @@ pub fn part1(input: &str) -> i32 {
                 }
             }
         }
-        // populate considered
 
+        // populate considered
         for (to, from) in considered {
             let Some(from) = from else { continue; };
-            ground.insert(to, 1);
-            ground.insert(from, 0);
+            ground.insert(to);
+            ground.remove(&from);
         }
     }
 
@@ -66,39 +66,37 @@ pub fn part1(input: &str) -> i32 {
     let mut min_y = i32::MAX;
     let mut max_y = i32::MIN;
 
-    for (&[x, y], _) in ground.iter().filter(|&(_, n)| *n == 1) {
+    for &[x, y] in ground.iter() {
         min_x = min_x.min(x);
         max_x = max_x.max(x);
         min_y = min_y.min(y);
         max_y = max_y.max(y);
     }
 
-    (max_x - min_x + 1) * (max_y - min_y + 1)
+    ((max_x - min_x + 1) * (max_y - min_y + 1)) as usize
         - ground
             .into_iter()
-            .filter_map(|([x, y], t)| {
-                ((min_x..=max_x).contains(&x) && (y..=max_y).contains(&y)).then_some(t)
-            })
-            .sum::<i32>()
+            .filter(|&[x, y]| ((min_x..=max_x).contains(&x) && (y..=max_y).contains(&y)))
+            .count()
 }
 
 pub fn part2(input: &str) -> usize {
-    let mut ground = parse_ground(input); // 1 -> elf, 0 -> empty
+    let mut ground = parse_ground(input);
 
     for round in 0.. {
         let mut considered = HashMap::new();
-        for (&[x, y], _) in ground.iter().filter(|&(_, chr)| *chr == 1) {
+        for &[x, y] in ground.iter() {
             // check if elf is alone
             if ADJ.into_iter().all(|(dx, dy)| {
                 let (x_1, y_1) = (x + dx, y + dy);
-                ground.get(&[x_1, y_1]) != Some(&1)
+                !ground.contains(&[x_1, y_1])
             }) {
                 continue;
             };
             for deltas in DIRECTIONS.into_iter().cycle().skip(round % 4).take(4) {
                 if deltas.into_iter().all(|(dx, dy)| {
                     let (x_1, y_1) = (x + dx, y + dy);
-                    ground.get(&[x_1, y_1]) != Some(&1)
+                    !ground.contains(&[x_1, y_1])
                 }) {
                     let (dx, dy) = deltas[1];
 
@@ -123,25 +121,22 @@ pub fn part2(input: &str) -> usize {
         // populate considered
         for (to, from) in considered {
             let Some(from) = from else { continue; };
-            ground.insert(to, 1);
-            ground.insert(from, 0);
+            ground.insert(to);
+            ground.remove(&from);
         }
     }
 
     unreachable!()
 }
 
-fn parse_ground(input: &str) -> HashMap<[i32; 2], i32> {
-    let mut gr = HashMap::new();
+fn parse_ground(input: &str) -> HashSet<[i32; 2]> {
+    let mut gr = HashSet::new();
 
     for (x, line) in input.lines().enumerate() {
         for (y, chr) in line.chars().enumerate() {
-            let tile = match chr {
-                '.' => 0,
-                '#' => 1,
-                _ => unreachable!(),
-            };
-            gr.insert([x as i32, y as i32], tile);
+            if chr == '#' {
+                gr.insert([x as i32, y as i32]);
+            }
         }
     }
 
