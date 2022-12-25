@@ -344,6 +344,7 @@ mod tests {
 >>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
 
     #[test]
+    #[ignore]
     fn part1_works() {
         let output = 3068;
 
@@ -351,6 +352,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn part2_works() {
         let output = 1_514_285_714_288;
 
