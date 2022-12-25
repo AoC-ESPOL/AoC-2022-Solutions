@@ -1,46 +1,39 @@
 pub fn part1(input: &str) -> String {
-    let mut decimal: i64 = input.lines().map(parse_snafu).sum();
+    let mut decimal: i64 = input
+        .as_bytes()
+        .split(|&c| c == b'\n')
+        .flat_map(|line| {
+            line.iter().rev().zip(0..).map(|(chr, position)| {
+                let digit = match chr {
+                    b'=' => -2,
+                    b'-' => -1,
+                    _ => i64::from(chr - b'0'),
+                };
 
-    let mut snafu = String::new();
+                5_i64.pow(position) * digit
+            })
+        })
+        .sum();
+
+    let mut snafu = Vec::new();
 
     while decimal > 0 {
-        let (digit, chr) = match decimal % 5 {
-            0 => (0, '0'),
-            1 => (1, '1'),
-            2 => (2, '2'),
-            3 => (-2, '='),
-            4 => (-1, '-'),
-            _ => unreachable!(),
+        let chr = match decimal % 5 {
+            3 => b'=',
+            4 => b'-',
+            rem => b'0' + rem as u8,
         };
         snafu.push(chr);
-        decimal -= digit;
-        decimal /= 5;
+        decimal = (decimal + 2) / 5;
     }
 
-    snafu.chars().rev().collect()
+    snafu.reverse();
+
+    String::from_utf8(snafu).unwrap()
 }
 
 pub fn part2(_input: &str) -> &'static str {
     "Merry Christmas!"
-}
-
-fn parse_snafu(input: &str) -> i64 {
-    input
-        .chars()
-        .rev()
-        .enumerate()
-        .fold(0, |acc, (position, chr)| {
-            let digit: i64 = match chr {
-                '=' => -2,
-                '-' => -1,
-                '0' => 0,
-                '1' => 1,
-                '2' => 2,
-                _ => unreachable!(),
-            };
-
-            acc + 5_i64.pow(position as u32) * digit
-        })
 }
 
 #[cfg(test)]
