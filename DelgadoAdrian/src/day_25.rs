@@ -18,6 +18,7 @@ pub fn part1(input: &str) -> String {
     let mut snafu = Vec::new();
 
     while decimal > 0 {
+        #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         let chr = match decimal % 5 {
             3 => b'=',
             4 => b'-',
