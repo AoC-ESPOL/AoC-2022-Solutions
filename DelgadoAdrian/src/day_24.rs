@@ -1,12 +1,17 @@
-use rustc_hash::FxHashSet;
-use std::{collections::VecDeque, slice};
+use rustc_hash::FxHashMap;
+use std::{
+    cmp::Reverse,
+    collections::{hash_map::Entry, BinaryHeap},
+    slice,
+};
 
 fn solve<const TAKE: usize>(input: &str) -> u32 {
     let valley = parse_valley(input);
 
-    // BFS
-    let mut queue = VecDeque::new();
-    let mut visited = FxHashSet::default();
+    // A* adapted from https://docs.rs/petgraph/latest/src/petgraph/algo/astar.rs.html
+    let mut visit_next = BinaryHeap::new();
+    let mut scores = FxHashMap::default(); // g-values, cost to reach the node
+    let mut estimate_scores = FxHashMap::default(); // f-values, cost to reach + estimate cost to goal
 
     let mut next_starting_state = (Location::Start, 0);
 
@@ -14,26 +19,79 @@ fn solve<const TAKE: usize>(input: &str) -> u32 {
         .into_iter()
         .take(TAKE)
     {
-        queue.push_back(next_starting_state);
+        scores.insert(next_starting_state, 0);
+        visit_next.push(Reverse((
+            estimate_cost(next_starting_state.0, &valley, end_goal == Location::Start),
+            next_starting_state,
+        )));
 
-        while let Some((curr_location, curr_time)) = queue.pop_front() {
-            if curr_location == end_goal {
-                next_starting_state = (curr_location, curr_time);
+        while let Some(Reverse((estimate_score, node))) = visit_next.pop() {
+            if node.0 == end_goal {
+                let cost = scores[&node];
+                next_starting_state = (end_goal, cost + next_starting_state.1);
                 break;
             }
 
-            for neigh in valley.neighbors(curr_location, curr_time) {
-                if visited.insert(neigh) {
-                    queue.push_back(neigh);
+            // This lookup can be unwrapped without fear of panic since the node was necessarily scored
+            // before adding it to `visit_next`.
+            let node_score = scores[&node];
+
+            match estimate_scores.entry(node) {
+                Entry::Occupied(mut entry) => {
+                    // If the node has already been visited with an equal or lower score than now, then
+                    // we do not need to re-visit it.
+                    if *entry.get() <= estimate_score {
+                        continue;
+                    }
+                    entry.insert(estimate_score);
                 }
+                Entry::Vacant(entry) => {
+                    entry.insert(estimate_score);
+                }
+            }
+
+            for next in valley.neighbors(node) {
+                let next_score = node_score + 1;
+
+                match scores.entry(next) {
+                    Entry::Occupied(mut entry) => {
+                        // No need to add neighbors that we have already reached through a shorter path
+                        // than now.
+                        if *entry.get() <= next_score {
+                            continue;
+                        }
+                        entry.insert(next_score);
+                    }
+                    Entry::Vacant(entry) => {
+                        entry.insert(next_score);
+                    }
+                }
+
+                let next_estimate_score =
+                    next_score + estimate_cost(next.0, &valley, end_goal == Location::Start);
+                visit_next.push(Reverse((next_estimate_score, next)));
             }
         }
 
-        queue.clear();
-        visited.clear();
+        visit_next.clear();
+        scores.clear();
+        estimate_scores.clear();
     }
 
     next_starting_state.1
+}
+
+fn estimate_cost(location: Location, valley: &Valley, going_back: bool) -> u32 {
+    let sum = u32::from(valley.height) + u32::from(valley.width);
+    let not_going_back = u32::from(!going_back);
+    match location {
+        Location::Start => sum * not_going_back,
+        Location::End => sum * (1 - not_going_back),
+        Location::Inside([row, col]) => {
+            let (row, col) = (u32::from(row), u32::from(col));
+            sum * not_going_back + (row + col + 1) - not_going_back * 2 * (row + col + 1)
+        }
+    }
 }
 
 pub fn part1(input: &str) -> u32 {
@@ -95,7 +153,7 @@ struct Valley {
 }
 
 impl Valley {
-    fn neighbors(&self, curr_location: Location, curr_time: u32) -> Neighbors {
+    fn neighbors(&self, (curr_location, curr_time): (Location, u32)) -> Neighbors {
         let next_time = curr_time + 1;
 
         let variant = match curr_location {
@@ -234,7 +292,7 @@ struct BlizzardRow {
     north: u128,
 }
 
-#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy, PartialOrd, Ord)]
 enum Location {
     Start,
     End,
