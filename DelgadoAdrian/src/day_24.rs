@@ -34,18 +34,14 @@ pub fn part2(input: &str) -> u32 {
     let mut queue = VecDeque::new();
     let mut visited = HashSet::new();
 
-    let mut last_finish_time = 0;
+    let mut next_starting_state = (Location::Start, 0);
 
-    for (start, end_goal) in [
-        (Location::Start, Location::End),
-        (Location::End, Location::Start),
-        (Location::Start, Location::End),
-    ] {
-        queue.push_back((start, last_finish_time));
+    for end_goal in [Location::End, Location::Start, Location::End] {
+        queue.push_back(next_starting_state);
 
         while let Some((curr_location, curr_time)) = queue.pop_front() {
             if curr_location == end_goal {
-                last_finish_time = curr_time;
+                next_starting_state = (curr_location, curr_time);
                 break;
             }
 
@@ -60,7 +56,7 @@ pub fn part2(input: &str) -> u32 {
         visited.clear();
     }
 
-    last_finish_time
+    next_starting_state.1
 }
 
 fn parse_valley(input: &str) -> Valley {
