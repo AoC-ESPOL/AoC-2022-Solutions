@@ -1,52 +1,23 @@
-use std::collections::{HashSet, VecDeque};
+use std::{
+    collections::{HashSet, VecDeque},
+    slice,
+};
 
 pub fn part1(input: &str) -> u32 {
-    let width = input.find('\n').unwrap() as u32 - 2;
-    let height = input.lines().count() as u32 - 2;
-    let dimensions = (height, width);
-    let mut labr = parse_labr(input);
+    let valley = parse_valley(input);
 
-    let mut global_minutes = 5;
-
-    for _ in 0..global_minutes {
-        for blz in &mut labr {
-            blz.advance(dimensions);
-        }
-    }
-
+    // BFS
     let mut queue = VecDeque::new();
     let mut visited = HashSet::new();
 
-    queue.push_back(([0, 0], global_minutes));
+    queue.push_back((Location::Start, 0));
 
-    while let Some((curr_pos, curr_time)) = queue.pop_front() {
-        if curr_pos == [height - 1, width - 1] {
-            return curr_time + 1;
+    while let Some((curr_location, curr_time)) = queue.pop_front() {
+        if matches!(curr_location, Location::End) {
+            return curr_time;
         }
 
-        if curr_time != global_minutes {
-            global_minutes += 1;
-            for blz in &mut labr {
-                blz.advance(dimensions);
-            }
-        }
-
-        let [curr_x, curr_y] = curr_pos;
-
-        for neigh in [[0, 1], [1, 0], [0, -1], [-1, 0], [0, 0]]
-            .into_iter()
-            .filter_map(|[dx, dy]: [i32; 2]| {
-                let x = dx.checked_add_unsigned(curr_x)?.try_into().ok()?;
-                let y = dy.checked_add_unsigned(curr_y)?.try_into().ok()?;
-                (x < height && y < width).then_some([x, y])
-            })
-            .filter(|&pos| {
-                Blizz::all_around_pos(dimensions, pos)
-                    .into_iter()
-                    .all(|near_blz| !labr.contains(&near_blz))
-            })
-            .map(|next_pos| (next_pos, curr_time + 1))
-        {
+        for neigh in valley.neighbors(curr_location, curr_time) {
             if visited.insert(neigh) {
                 queue.push_back(neigh);
             }
@@ -57,254 +28,266 @@ pub fn part1(input: &str) -> u32 {
 }
 
 pub fn part2(input: &str) -> u32 {
-    let width = input.find('\n').unwrap() as u32 - 2;
-    let height = input.lines().count() as u32 - 2;
-    let dimensions = (height, width);
-    let mut labr = parse_labr(input);
+    let valley = parse_valley(input);
 
-    let mut global_minutes = 5;
-
-    for _ in 0..global_minutes {
-        for blz in &mut labr {
-            blz.advance(dimensions);
-        }
-    }
-
+    // BFS
     let mut queue = VecDeque::new();
     let mut visited = HashSet::new();
 
-    queue.push_back(([0, 0], global_minutes));
+    let mut last_finish_time = 0;
 
-    while let Some((curr_pos, curr_time)) = queue.pop_front() {
-        if curr_pos == [height - 1, width - 1] {
-            global_minutes += 1;
-            break;
-        }
+    for (start, end_goal) in [
+        (Location::Start, Location::End),
+        (Location::End, Location::Start),
+        (Location::Start, Location::End),
+    ] {
+        queue.push_back((start, last_finish_time));
 
-        if curr_time != global_minutes {
-            global_minutes += 1;
-            for blz in &mut labr {
-                blz.advance(dimensions);
+        while let Some((curr_location, curr_time)) = queue.pop_front() {
+            if curr_location == end_goal {
+                last_finish_time = curr_time;
+                break;
+            }
+
+            for neigh in valley.neighbors(curr_location, curr_time) {
+                if visited.insert(neigh) {
+                    queue.push_back(neigh);
+                }
             }
         }
 
-        let [curr_x, curr_y] = curr_pos;
-
-        for neigh in [[0, 1], [1, 0], [0, -1], [-1, 0], [0, 0]]
-            .into_iter()
-            .filter_map(|[dx, dy]: [i32; 2]| {
-                let x = dx.checked_add_unsigned(curr_x)?.try_into().ok()?;
-                let y = dy.checked_add_unsigned(curr_y)?.try_into().ok()?;
-                (x < height && y < width).then_some([x, y])
-            })
-            .filter(|&pos| {
-                Blizz::all_around_pos(dimensions, pos)
-                    .into_iter()
-                    .all(|near_blz| !labr.contains(&near_blz))
-            })
-            .map(|next_pos| (next_pos, curr_time + 1))
-        {
-            if visited.insert(neigh) {
-                queue.push_back(neigh);
-            }
-        }
+        queue.clear();
+        visited.clear();
     }
 
-    let skip = 6;
-    for _ in 0..=skip {
-        for blz in &mut labr {
-            blz.advance(dimensions);
-        }
-    }
-    global_minutes += skip;
-
-    let mut queue = VecDeque::new();
-    let mut visited = HashSet::new();
-
-    queue.push_back(([height - 1, width - 1], global_minutes));
-
-    while let Some((curr_pos, curr_time)) = queue.pop_front() {
-        if curr_pos == [0, 0] {
-            global_minutes += 1;
-            break;
-        }
-
-        if curr_time != global_minutes {
-            global_minutes += 1;
-            for blz in &mut labr {
-                blz.advance(dimensions);
-            }
-        }
-
-        let [curr_x, curr_y] = curr_pos;
-
-        for neigh in [[0, 1], [1, 0], [0, -1], [-1, 0], [0, 0]]
-            .into_iter()
-            .filter_map(|[dx, dy]: [i32; 2]| {
-                let x = dx.checked_add_unsigned(curr_x)?.try_into().ok()?;
-                let y = dy.checked_add_unsigned(curr_y)?.try_into().ok()?;
-                (x < height && y < width).then_some([x, y])
-            })
-            .filter(|&pos| {
-                Blizz::all_around_pos(dimensions, pos)
-                    .into_iter()
-                    .all(|near_blz| !labr.contains(&near_blz))
-            })
-            .map(|next_pos| (next_pos, curr_time + 1))
-        {
-            if visited.insert(neigh) {
-                queue.push_back(neigh);
-            }
-        }
-    }
-
-    let skip = 1;
-    for _ in 0..=skip {
-        for blz in &mut labr {
-            blz.advance(dimensions);
-        }
-    }
-    global_minutes += skip;
-
-    let mut queue = VecDeque::new();
-    let mut visited = HashSet::new();
-
-    queue.push_back(([0, 0], global_minutes));
-
-    while let Some((curr_pos, curr_time)) = queue.pop_front() {
-        if curr_pos == [height - 1, width - 1] {
-            return curr_time + 1;
-        }
-
-        if curr_time != global_minutes {
-            global_minutes += 1;
-            for blz in &mut labr {
-                blz.advance(dimensions);
-            }
-        }
-
-        let [curr_x, curr_y] = curr_pos;
-
-        for neigh in [[0, 1], [1, 0], [0, -1], [-1, 0], [0, 0]]
-            .into_iter()
-            .filter_map(|[dx, dy]: [i32; 2]| {
-                let x = dx.checked_add_unsigned(curr_x)?.try_into().ok()?;
-                let y = dy.checked_add_unsigned(curr_y)?.try_into().ok()?;
-                (x < height && y < width).then_some([x, y])
-            })
-            .filter(|&pos| {
-                Blizz::all_around_pos(dimensions, pos)
-                    .into_iter()
-                    .all(|near_blz| !labr.contains(&near_blz))
-            })
-            .map(|next_pos| (next_pos, curr_time + 1))
-        {
-            if visited.insert(neigh) {
-                queue.push_back(neigh);
-            }
-        }
-    }
-
-    unreachable!()
+    last_finish_time
 }
 
-fn parse_labr(input: &str) -> Vec<Blizz> {
-    let mut labr = Vec::new();
+fn parse_valley(input: &str) -> Valley {
+    let width: u8 = input.find('\n').unwrap().try_into().unwrap();
+    let height: u8 = input.lines().count().try_into().unwrap();
+    let (width, height) = (width - 2, height - 2); // remove walls
 
-    for (x, row) in input.lines().skip(1).enumerate() {
-        for (y, chr) in row.as_bytes().iter().skip(1).enumerate() {
-            let dir = match chr {
-                b'>' => Dir::E,
-                b'v' => Dir::S,
-                b'<' => Dir::W,
-                b'^' => Dir::N,
-                _ => continue,
-            };
+    assert!(width <= 128, "we use a u128 as a bitmap");
+    assert!(height <= 128, "we use a u128 as a bitmap");
 
-            labr.push(Blizz {
-                coords: [x as u32, y as u32],
-                direction: dir,
-            });
-        }
+    let blizzards = input
+        .lines()
+        .skip(1)
+        .map(|line| {
+            let [east, west, south, north] = line
+                .as_bytes()
+                .iter()
+                .skip(1)
+                .zip(0..)
+                .filter_map(|(&chr, col)| {
+                    //east west south north
+                    Some(match chr {
+                        b'>' => [1 << col, 0, 0, 0],
+                        b'<' => [0, 1 << col, 0, 0],
+                        b'v' => [0, 0, 1 << col, 0],
+                        b'^' => [0, 0, 0, 1 << col],
+                        _ => return None,
+                    })
+                })
+                .fold([0; 4], |[a_0, a_1, a_2, a_3], [b_0, b_1, b_2, b_3]| {
+                    [a_0 | b_0, a_1 | b_1, a_2 | b_2, a_3 | b_3]
+                });
+
+            BlizzardRow {
+                east,
+                west,
+                south,
+                north,
+            }
+        })
+        .collect();
+
+    Valley {
+        blizzards,
+        width,
+        height,
     }
-
-    labr
 }
 
-#[derive(Debug, Clone, Hash, PartialEq, Eq)]
-struct Blizz {
-    coords: [u32; 2],
-    direction: Dir,
+struct Valley {
+    blizzards: Vec<BlizzardRow>,
+    width: u8,
+    height: u8,
 }
 
-impl Blizz {
-    fn advance(&mut self, dimensions: (u32, u32)) {
-        let [x, y] = self.coords;
-        let (mod_x, mod_y) = dimensions;
-        self.coords = match self.direction {
-            Dir::N => [(x + mod_x - 1) % mod_x, y],
-            Dir::S => [(x + 1) % mod_x, y],
-            Dir::E => [x, (y + 1) % mod_y],
-            Dir::W => [x, (y + mod_y - 1) % mod_y],
-        }
-    }
+impl Valley {
+    fn neighbors(&self, curr_location: Location, curr_time: u32) -> Neighbors {
+        let next_time = curr_time + 1;
 
-    fn all_around_pos(dimensions: (u32, u32), pos: [u32; 2]) -> [Blizz; 4] {
-        let [x, y] = pos;
-        let (mod_x, mod_y) = dimensions;
-        let north = Blizz {
-            coords: [(x + mod_x - 1) % mod_x, y],
-            direction: Dir::S,
-        };
-        let south = Blizz {
-            coords: [(x + 1) % mod_x, y],
-            direction: Dir::N,
-        };
-        let east = Blizz {
-            coords: [x, (y + 1) % mod_y],
-            direction: Dir::W,
-        };
-        let west = Blizz {
-            coords: [x, (y + mod_y - 1) % mod_y],
-            direction: Dir::E,
+        let variant = match curr_location {
+            Location::Inside(curr_location) => NeighborsVariant::Inside {
+                valley: self,
+                curr_location,
+                deltas: [(0, 1), (1, 0), (0, 0), (0, -1), (-1, 0)].iter(),
+            },
+            Location::Start => {
+                if self.is_available([0, 0], next_time) {
+                    NeighborsVariant::Start2
+                } else {
+                    NeighborsVariant::Start1
+                }
+            }
+            Location::End => {
+                let end = [self.height - 1, self.width - 1];
+                if self.is_available(end, next_time) {
+                    NeighborsVariant::End2(end)
+                } else {
+                    NeighborsVariant::End1
+                }
+            }
         };
 
-        [north, south, east, west]
+        Neighbors { next_time, variant }
+    }
+
+    fn is_available(&self, [row, col]: [u8; 2], time: u32) -> bool {
+        let width = u32::from(self.width);
+        let height = u32::from(self.height);
+        let col_32 = u32::from(col);
+        let row_32 = u32::from(row);
+
+        let w_col: u8 = ((col_32 + time) % width).try_into().unwrap();
+        let e_col: u8 = ((col_32 + width - time % width) % width)
+            .try_into()
+            .unwrap();
+        let n_row: usize = ((time + row_32) % height).try_into().unwrap();
+        let s_row: usize = ((row_32 + height - time % height) % height)
+            .try_into()
+            .unwrap();
+
+        let col_mask = 1 << col;
+        let west_mask = 1 << w_col;
+        let east_mask = 1 << e_col;
+
+        !(self.blizzards[row as usize].west & west_mask == west_mask
+            || self.blizzards[row as usize].east & east_mask == east_mask
+            || self.blizzards[n_row].north & col_mask == col_mask
+            || self.blizzards[s_row].south & col_mask == col_mask)
     }
 }
 
-#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
-enum Dir {
-    N,
-    S,
-    E,
-    W,
+enum NeighborsVariant<'a> {
+    NoNeighbors,
+    Start1,
+    Start2,
+    End1,
+    End2([u8; 2]),
+    Inside {
+        valley: &'a Valley,
+        curr_location: [u8; 2],
+        deltas: slice::Iter<'static, (i8, i8)>,
+    },
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::{part1, part2};
+struct Neighbors<'a> {
+    next_time: u32,
+    variant: NeighborsVariant<'a>,
+}
 
-//     const TEST_INPUT: &str = "\
-// #.######
-// #>>.<^<#
-// #.<..<<#
-// #>v.><>#
-// #<^v^^>#
-// ######.#";
+impl<'a> Iterator for Neighbors<'a> {
+    type Item = (Location, u32);
 
-//     #[test]
-//     #[ignore]
-//     fn part1_works() {
-//         let output = 18;
+    fn next(&mut self) -> Option<Self::Item> {
+        let next_time = self.next_time;
 
-//         assert_eq!(part1(TEST_INPUT), output);
-//     }
+        match &mut self.variant {
+            NeighborsVariant::Inside {
+                valley,
+                curr_location,
+                deltas,
+            } => {
+                let [row, col] = curr_location;
 
-//     // #[test]
-//     // fn part2_works() {
-//     //     let output = 54;
+                for &(d_row, d_col) in deltas {
+                    match (
+                        row.overflowing_add_signed(d_row),
+                        col.overflowing_add_signed(d_col),
+                    ) {
+                        ((row, false), (col, false))
+                            if row < valley.height && col < valley.width =>
+                        {
+                            if valley.is_available([row, col], next_time) {
+                                return Some((Location::Inside([row, col]), next_time));
+                            }
+                        }
+                        ((u8::MAX, true), (0, false)) => return Some((Location::Start, next_time)),
+                        ((row, false), (col, false))
+                            if (row, col) == (valley.height, valley.width - 1) =>
+                        {
+                            return Some((Location::End, next_time))
+                        }
+                        _ => (),
+                    };
+                }
+                None
+            }
+            NeighborsVariant::NoNeighbors => None,
+            NeighborsVariant::Start1 => {
+                self.variant = NeighborsVariant::NoNeighbors;
+                Some((Location::Start, next_time))
+            }
+            NeighborsVariant::Start2 => {
+                self.variant = NeighborsVariant::Start1;
+                Some((Location::Inside([0, 0]), next_time))
+            }
+            NeighborsVariant::End1 => {
+                self.variant = NeighborsVariant::NoNeighbors;
+                Some((Location::End, next_time))
+            }
+            NeighborsVariant::End2(end) => {
+                let end = *end;
+                self.variant = NeighborsVariant::End1;
+                Some((Location::Inside(end), next_time))
+            }
+        }
+    }
+}
 
-//     //     assert_eq!(part2(TEST_INPUT), output);
-//     // }
-// }
+struct BlizzardRow {
+    east: u128,
+    west: u128,
+    south: u128,
+    north: u128,
+}
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone, Copy)]
+enum Location {
+    Start,
+    End,
+    Inside([u8; 2]),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{part1, part2};
+
+    const TEST_INPUT: &str = "\
+#.######
+#>>.<^<#
+#.<..<<#
+#>v.><>#
+#<^v^^>#
+######.#";
+
+    #[test]
+    #[ignore]
+    fn part1_works() {
+        let output = 18;
+
+        assert_eq!(part1(TEST_INPUT), output);
+    }
+
+    #[test]
+    #[ignore]
+    fn part2_works() {
+        let output = 54;
+
+        assert_eq!(part2(TEST_INPUT), output);
+    }
+}
