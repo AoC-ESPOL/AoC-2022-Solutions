@@ -1,42 +1,19 @@
-use std::{
-    collections::{HashSet, VecDeque},
-    slice,
-};
+use rustc_hash::FxHashSet;
+use std::{collections::VecDeque, slice};
 
-pub fn part1(input: &str) -> u32 {
+fn solve<const TAKE: usize>(input: &str) -> u32 {
     let valley = parse_valley(input);
 
     // BFS
     let mut queue = VecDeque::new();
-    let mut visited = HashSet::new();
-
-    queue.push_back((Location::Start, 0));
-
-    while let Some((curr_location, curr_time)) = queue.pop_front() {
-        if matches!(curr_location, Location::End) {
-            return curr_time;
-        }
-
-        for neigh in valley.neighbors(curr_location, curr_time) {
-            if visited.insert(neigh) {
-                queue.push_back(neigh);
-            }
-        }
-    }
-
-    unreachable!()
-}
-
-pub fn part2(input: &str) -> u32 {
-    let valley = parse_valley(input);
-
-    // BFS
-    let mut queue = VecDeque::new();
-    let mut visited = HashSet::new();
+    let mut visited = FxHashSet::default();
 
     let mut next_starting_state = (Location::Start, 0);
 
-    for end_goal in [Location::End, Location::Start, Location::End] {
+    for end_goal in [Location::End, Location::Start, Location::End]
+        .into_iter()
+        .take(TAKE)
+    {
         queue.push_back(next_starting_state);
 
         while let Some((curr_location, curr_time)) = queue.pop_front() {
@@ -59,6 +36,14 @@ pub fn part2(input: &str) -> u32 {
     next_starting_state.1
 }
 
+pub fn part1(input: &str) -> u32 {
+    solve::<1>(input)
+}
+
+pub fn part2(input: &str) -> u32 {
+    solve::<3>(input)
+}
+
 fn parse_valley(input: &str) -> Valley {
     let width: u8 = input.find('\n').unwrap().try_into().unwrap();
     let height: u8 = input.lines().count().try_into().unwrap();
@@ -71,13 +56,11 @@ fn parse_valley(input: &str) -> Valley {
         .lines()
         .skip(1)
         .map(|line| {
-            let [east, west, south, north] = line
-                .as_bytes()
+            line.as_bytes()
                 .iter()
                 .skip(1)
                 .zip(0..)
                 .filter_map(|(&chr, col)| {
-                    //east west south north
                     Some(match chr {
                         b'>' => [1 << col, 0, 0, 0],
                         b'<' => [0, 1 << col, 0, 0],
@@ -88,14 +71,13 @@ fn parse_valley(input: &str) -> Valley {
                 })
                 .fold([0; 4], |[a_0, a_1, a_2, a_3], [b_0, b_1, b_2, b_3]| {
                     [a_0 | b_0, a_1 | b_1, a_2 | b_2, a_3 | b_3]
-                });
-
-            BlizzardRow {
-                east,
-                west,
-                south,
-                north,
-            }
+                })
+        })
+        .map(|[east, west, south, north]| BlizzardRow {
+            east,
+            west,
+            south,
+            north,
         })
         .collect();
 
@@ -152,7 +134,7 @@ impl Valley {
         let e_col: u8 = ((col_32 + width - time % width) % width)
             .try_into()
             .unwrap();
-        let n_row: usize = ((time + row_32) % height).try_into().unwrap();
+        let n_row: usize = ((row_32 + time) % height).try_into().unwrap();
         let s_row: usize = ((row_32 + height - time % height) % height)
             .try_into()
             .unwrap();
@@ -205,16 +187,16 @@ impl<'a> Iterator for Neighbors<'a> {
                         row.overflowing_add_signed(d_row),
                         col.overflowing_add_signed(d_col),
                     ) {
-                        ((row, false), (col, false))
-                            if row < valley.height && col < valley.width =>
+                        ((n_row, false), (n_col, false))
+                            if n_row < valley.height && n_col < valley.width =>
                         {
-                            if valley.is_available([row, col], next_time) {
-                                return Some((Location::Inside([row, col]), next_time));
+                            if valley.is_available([n_row, n_col], next_time) {
+                                return Some((Location::Inside([n_row, n_col]), next_time));
                             }
                         }
-                        ((u8::MAX, true), (0, false)) => return Some((Location::Start, next_time)),
-                        ((row, false), (col, false))
-                            if (row, col) == (valley.height, valley.width - 1) =>
+                        ((_, true), (0, false)) => return Some((Location::Start, next_time)),
+                        ((n_row, false), (n_col, false))
+                            if (n_row, n_col) == (valley.height, valley.width - 1) =>
                         {
                             return Some((Location::End, next_time))
                         }
